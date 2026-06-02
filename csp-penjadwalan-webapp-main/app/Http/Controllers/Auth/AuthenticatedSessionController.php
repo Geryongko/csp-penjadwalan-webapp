@@ -3,37 +3,60 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Auth\LoginRequest; 
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Inertia\Inertia;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     */
-    public function create(): View
+    
+    public function create()
     {
-        return view('auth.login');
+        return Inertia::render('Auth/Login', [
+            'status' => session('status'),
+        ]);
     }
 
-    /**
-     * Handle an incoming authentication request.
-     */
+    
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
 
-        $request->session()->regenerate();
+        $credentials = $request->validated();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+
+            $request->session()->regenerate();
+
+
+            $role = Auth::user()->role_id;
+
+
+            if ($role == 1) { 
+                return redirect()->intended(route('admin.dashboard'));
+            }
+            elseif ($role == 3) { 
+
+                return redirect()->intended(route('student.dashboard'));
+            }
+            elseif ($role == 2) { 
+
+                return redirect()->intended('/');
+            }
+
+
+            return redirect()->intended('/');
+        }
+
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 
-    /**
-     * Destroy an authenticated session.
-     */
+    
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();

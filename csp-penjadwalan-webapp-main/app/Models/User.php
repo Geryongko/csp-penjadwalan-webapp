@@ -2,46 +2,100 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * Tentukan primary key kustom Anda.
+     */
+    protected $primaryKey = 'user_id';
+
+    /**
+     * Atribut yang bisa diisi (Mass Assignment).
      */
     protected $fillable = [
-        'name',
+        'full_name',
         'email',
-        'password',
+        'password_hash',
+        'role_id',
+        'phone_number',
+        'birth_date',
+        'address',
+        'profile_picture',
+        'last_login'
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * Atribut yang disembunyikan saat serialisasi.
      */
     protected $hidden = [
-        'password',
+        'password_hash',
         'remember_token',
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Casting tipe data otomatis.
      */
-    protected function casts(): array
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password_hash'     => 'hashed',
+        'birth_date'        => 'date',
+        'last_login'        => 'datetime',
+        'role_id'           => 'integer',
+        'is_active'         => 'boolean',
+    ];
+
+    /**
+     * Override password field.
+     */
+    public function getAuthPassword()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->password_hash;
+    }
+
+    public function getAuthPasswordName()
+    {
+        return 'password_hash';
+    }
+
+
+
+    /**
+     * Relasi ke Profil Mahasiswa.
+     */
+    public function studentProfile(): HasOne
+    {
+        return $this->hasOne(StudentProfile::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Relasi ke Profil Dosen.
+     */
+    public function lecturerProfile(): HasOne
+    {
+        return $this->hasOne(LecturerProfile::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Relasi ke Grades (Riwayat Nilai).
+     * Digunakan untuk mengambil history nilai mahasiswa.
+     */
+    public function grades(): HasMany
+    {
+        return $this->hasMany(Grade::class, 'student_id', 'user_id');
+    }
+
+
+    public function profileInfo()
+    {
+        return $this->hasOne(StudentProfileInfo::class, 'user_id', 'user_id');
     }
 }
