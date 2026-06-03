@@ -50,37 +50,31 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
-
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-        Route::resource('users', UserController::class)->except(['show']);
-        Route::resource('faculties', FacultyController::class)->except(['create', 'edit', 'show']);
-        Route::resource('majors', MajorController::class)->except(['create', 'edit', 'show']);
-        Route::resource('semesters', SemesterController::class)->except(['create', 'edit', 'show']);
-        Route::resource('courses', CourseController::class)->except(['show']);
-        Route::resource('rooms', RoomController::class)->except(['create', 'edit', 'show']);
-        Route::resource('classes', CourseClassController::class)->except(['show']);
-
-        Route::get('curriculums', [CurriculumController::class, 'index'])->name('curriculums.index');
-        Route::post('curriculums', [CurriculumController::class, 'store'])->name('curriculums.store');
-        Route::delete('curriculums/{id}', [CurriculumController::class, 'destroy'])->name('curriculums.destroy');
-
-        Route::resource('cost_components', CostComponentController::class)->except(['show']);
+    Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+        
+        Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+        Route::resource('programs', App\Http\Controllers\Admin\ProgramController::class)->except(['show']);
+        Route::resource('rooms', App\Http\Controllers\Admin\RoomController::class)->except(['show']);
+        Route::resource('semesters', App\Http\Controllers\Admin\SemesterController::class)->except(['show']);
+        Route::resource('subjects', App\Http\Controllers\Admin\SubjectController::class)->except(['show']);
+        Route::resource('rombels', App\Http\Controllers\Admin\RombelController::class);
+        
+        Route::get('curriculums', [App\Http\Controllers\Admin\CurriculumController::class, 'index'])->name('curriculums.index');
+        Route::post('curriculums', [App\Http\Controllers\Admin\CurriculumController::class, 'store'])->name('curriculums.store');
+        Route::delete('curriculums/{id}', [App\Http\Controllers\Admin\CurriculumController::class, 'destroy'])->name('curriculums.destroy');
+        
+        Route::resource('cost_components', App\Http\Controllers\Admin\CostComponentController::class)->except(['show']);
     });
 
-    Route::middleware(['auth', 'verified'])->prefix('student')->name('student.')->group(function () {
+    Route::middleware(['auth', 'verified', 'student'])->prefix('student')->name('student.')->group(function () {
         Route::get('dashboard', [App\Http\Controllers\Student\DashboardController::class, 'index'])->name('dashboard');
-
-        Route::get('krs/create', [App\Http\Controllers\Student\KRSController::class, 'index'])->name('krs.create');
-        Route::post('krs/store', [App\Http\Controllers\Student\KRSController::class, 'store'])->name('krs.store');
-        Route::delete('krs/{id}', [App\Http\Controllers\Student\KRSController::class, 'destroy'])->name('krs.destroy');
-        Route::post('krs/submit', [App\Http\Controllers\Student\KRSController::class, 'submit'])->name('krs.submit');
-
-        Route::get('bills', [BillingController::class, 'index'])->name('bills.index');
-
-        Route::post('payment/create', [PaymentController::class, 'create'])->name('payment.create');
-
+        
+        // KRS logic has been removed for SMA
+        
+        Route::get('billing', [App\Http\Controllers\Student\BillingController::class, 'index'])->name('billing.index');
+        Route::post('billing/{billing}/pay', [App\Http\Controllers\Student\BillingController::class, 'pay'])->name('billing.pay');
+    
         Route::get('profile', [\App\Http\Controllers\Student\ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('profile', [\App\Http\Controllers\Student\ProfileController::class, 'update'])->name('profile.update');
         Route::put('password', [\App\Http\Controllers\Student\ProfileController::class, 'updatePassword'])->name('password.update');

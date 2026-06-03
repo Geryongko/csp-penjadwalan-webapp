@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import { debounce } from 'lodash';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Major, Faculty } from '../../../types';
+import { Subject, Program } from '../../../types';
 import Icon from '../../../Components/Icon';
 import {
   PageHeader,
@@ -17,8 +17,8 @@ import {
 
 interface IndexProps {
   auth: any;
-  majors: {
-    data: Major[];
+  subjects: {
+    data: Subject[];
     links: {
       url: string | null;
       label: string;
@@ -27,10 +27,10 @@ interface IndexProps {
     from: number;
     total: number;
   };
-  faculties: Faculty[];
+  programs: Program[];
   filters: {
     search?: string;
-    faculty_id?: string;
+    program_id?: string;
   };
   flash: {
     success?: string;
@@ -38,15 +38,15 @@ interface IndexProps {
   };
 }
 
-const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, flash = {} }) => {
+const SubjectIndex: React.FC<IndexProps> = ({ auth, subjects, programs, filters, flash = {} }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [selectedMajor, setSelectedMajor] = useState<Major | null>(null);
+  const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
 
   const [searchQuery, setSearchQuery] = useState(filters.search || '');
-  const [facultyFilter, setFacultyFilter] = useState(filters.faculty_id || '');
+  const [programFilter, setProgramFilter] = useState(filters.program_id || '');
 
   const [feedback, setFeedback] = useState<{
     isOpen: boolean;
@@ -80,8 +80,11 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
   }, [flash]);
 
   const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
-    major_name: '',
-    faculty_id: '',
+    subject_code: '',
+    subject_name: '',
+    jp: 2,
+    program_id: '',
+    description: '',
   });
 
   const handleOpenAddModal = () => {
@@ -91,19 +94,22 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
     setIsModalOpen(true);
   };
 
-  const handleOpenEditModal = (major: Major) => {
+  const handleOpenEditModal = (subject: Subject) => {
     setModalMode('edit');
     setData({
-        major_name: major.major_name,
-        faculty_id: String(major.faculty_id)
+        subject_code: subject.subject_code,
+        subject_name: subject.subject_name,
+        jp: subject.jp,
+        program_id: subject.program_id ? String(subject.program_id) : '',
+        description: subject.description || '',
     });
     clearErrors();
-    setSelectedMajor(major);
+    setSelectedSubject(subject);
     setIsModalOpen(true);
   };
 
-  const handleOpenDeleteModal = (major: Major) => {
-    setSelectedMajor(major);
+  const handleOpenDeleteModal = (subject: Subject) => {
+    setSelectedSubject(subject);
     setIsDeleteModalOpen(true);
   };
 
@@ -111,15 +117,15 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
     e.preventDefault();
 
     if (modalMode === 'add') {
-      post(route('admin.majors.store'), {
+      post(route('admin.subjects.store'), {
         onSuccess: () => {
           setIsModalOpen(false);
           reset();
         },
         preserveScroll: true
       });
-    } else if (selectedMajor) {
-      put(route('admin.majors.update', selectedMajor.major_id), {
+    } else if (selectedSubject) {
+      put(route('admin.subjects.update', selectedSubject.subject_id), {
         onSuccess: () => {
           setIsModalOpen(false);
           reset();
@@ -130,8 +136,8 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
   };
 
   const handleDeleteConfirm = () => {
-    if (selectedMajor) {
-      destroy(route('admin.majors.destroy', selectedMajor.major_id), {
+    if (selectedSubject) {
+      destroy(route('admin.subjects.destroy', selectedSubject.subject_id), {
         onSuccess: () => setIsDeleteModalOpen(false),
         preserveScroll: true
       });
@@ -139,10 +145,10 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
   };
 
   const applyFilters = useCallback(
-    debounce((search: string, faculty: string) => {
+    debounce((search: string, program: string) => {
       router.get(
-        route('admin.majors.index'),
-        { search, faculty_id: faculty },
+        route('admin.subjects.index'),
+        { search, program_id: program },
         { preserveState: true, replace: true }
       );
     }, 500),
@@ -151,41 +157,41 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
 
   const onSearchChange = (val: string) => {
     setSearchQuery(val);
-    applyFilters(val, facultyFilter);
+    applyFilters(val, programFilter);
   };
 
-  const onFacultyFilterChange = (val: string) => {
-    setFacultyFilter(val);
+  const onProgramFilterChange = (val: string) => {
+    setProgramFilter(val);
     applyFilters(searchQuery, val);
   };
 
   return (
     <AdminLayout user={auth.user}>
-      <Head title="Manage Majors" />
+      <Head title="Manage Subjects" />
 
       <div className="flex flex-col gap-6 animate-fade-in-up relative">
         <PageHeader
-          title="Majors Management"
-          subtitle="Manage the list of majors and their associated faculties."
-          actionLabel="Add Major"
+          title="Subjects Management"
+          subtitle="Manage the list of subjects (mata pelajaran)."
+          actionLabel="Add Subject"
           onAction={handleOpenAddModal}
         />
 
         <SearchFilterBar
           searchValue={searchQuery}
           onSearchChange={onSearchChange}
-          placeholder="Search majors..."
+          placeholder="Search by code or name..."
         >
             <div className="sm:w-64">
                <Select
-                   value={facultyFilter}
-                   onChange={(e) => onFacultyFilterChange(e.target.value)}
+                   value={programFilter}
+                   onChange={(e) => onProgramFilterChange(e.target.value)}
                    className="bg-gray-50 dark:bg-background-dark h-12"
                >
-                 <option value="">All Faculties</option>
-                 {faculties.map(faculty => (
-                   <option key={faculty.faculty_id} value={faculty.faculty_id}>
-                     {faculty.faculty_name}
+                 <option value="">All Programs</option>
+                 {programs.map(program => (
+                   <option key={program.program_id} value={program.program_id}>
+                     {program.program_name}
                    </option>
                  ))}
                </Select>
@@ -195,34 +201,38 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
         <Table>
           <Thead>
               <Th>#</Th>
-              <Th>Major Name</Th>
-              <Th>Faculty</Th>
+              <Th>Subject Code</Th>
+              <Th>Subject Name</Th>
+              <Th>JP</Th>
+              <Th>Program</Th>
               <Th>Actions</Th>
           </Thead>
           <Tbody>
-            {majors.data.length > 0 ? (
-              majors.data.map((major, index) => (
-                <tr key={major.major_id} className="hover:bg-gray-50 dark:hover:bg-background-dark/50 transition-colors">
+            {subjects.data.length > 0 ? (
+              subjects.data.map((subject, index) => (
+                <tr key={subject.subject_id} className="hover:bg-gray-50 dark:hover:bg-background-dark/50 transition-colors">
                   <Td className="text-gray-500 text-sm">
-                      {majors.from + index}
+                      {subjects.from + index}
                   </Td>
-                  <Td className="text-gray-900 dark:text-white font-medium">{major.major_name}</Td>
+                  <Td className="font-semibold text-primary">{subject.subject_code}</Td>
+                  <Td className="text-gray-900 dark:text-white font-medium">{subject.subject_name}</Td>
+                  <Td>{subject.jp} Jam</Td>
                   <Td>
-                      <Badge variant="primary">
-                          {major.faculty?.faculty_name || 'No Faculty'}
+                      <Badge variant={subject.program ? 'primary' : 'gray'}>
+                          {subject.program?.program_name || 'Umum'}
                       </Badge>
                   </Td>
                   <Td>
                     <div className="flex items-center gap-4">
                       <button
-                        onClick={() => handleOpenEditModal(major)}
+                        onClick={() => handleOpenEditModal(subject)}
                         className="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1.5 transition-colors"
                       >
                         <Icon name="edit" className="text-lg" />
                         Edit
                       </button>
                       <button
-                        onClick={() => handleOpenDeleteModal(major)}
+                        onClick={() => handleOpenDeleteModal(subject)}
                         className="text-red-500 hover:text-red-400 text-sm font-medium flex items-center gap-1.5 transition-colors"
                       >
                         <Icon name="delete" className="text-lg" />
@@ -233,14 +243,14 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
                 </tr>
               ))
             ) : (
-              <EmptyState message="No majors found matching your criteria." colSpan={4} />
+              <EmptyState message="No subjects found matching your criteria." colSpan={6} />
             )}
           </Tbody>
         </Table>
 
-        {majors.links.length > 3 && (
+        {subjects.links.length > 3 && (
             <div className="flex items-center justify-center p-4 gap-1 flex-wrap">
-                {majors.links.map((link, key) => (
+                {subjects.links.map((link, key) => (
                     link.url === null ? (
                         <div key={key} className="px-3 py-1 text-sm text-gray-400 border rounded-lg" dangerouslySetInnerHTML={{ __html: link.label }} />
                     ) : (
@@ -260,47 +270,74 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={modalMode === 'add' ? 'Add New Major' : 'Edit Major'}
+          title={modalMode === 'add' ? 'Add New Subject' : 'Edit Subject'}
           footer={
               <>
                   <Button variant="secondary" onClick={() => setIsModalOpen(false)} disabled={processing}>Cancel</Button>
                   <Button onClick={handleSubmit} isLoading={processing}>
-                      {modalMode === 'add' ? 'Save Major' : 'Update Major'}
+                      {modalMode === 'add' ? 'Save Subject' : 'Update Subject'}
                   </Button>
               </>
           }
         >
           <div className="space-y-4">
+              {modalMode === 'edit' && (
+                  <div className="space-y-2">
+                      <Label htmlFor="subject_code">Subject Code</Label>
+                      <Input
+                        type="text"
+                        id="subject_code"
+                        value={data.subject_code}
+                        onChange={(e) => setData('subject_code', e.target.value)}
+                        required
+                      />
+                      {errors.subject_code && <p className="text-sm text-red-500">{errors.subject_code}</p>}
+                  </div>
+              )}
+              
               <div className="space-y-2">
-                  <Label htmlFor="major_name">Major Name</Label>
+                  <Label htmlFor="subject_name">Subject Name</Label>
                   <Input
                     type="text"
-                    id="major_name"
-                    value={data.major_name}
-                    onChange={(e) => setData('major_name', e.target.value)}
-                    placeholder="e.g. Computer Science"
+                    id="subject_name"
+                    value={data.subject_name}
+                    onChange={(e) => setData('subject_name', e.target.value)}
+                    placeholder="e.g. Matematika Wajib"
                     autoFocus
                     required
                   />
-                  {errors.major_name && <p className="text-sm text-red-500">{errors.major_name}</p>}
+                  {errors.subject_name && <p className="text-sm text-red-500">{errors.subject_name}</p>}
               </div>
 
               <div className="space-y-2">
-                  <Label htmlFor="faculty_id">Faculty</Label>
+                  <Label htmlFor="jp">Jam Pelajaran (JP)</Label>
+                  <Input
+                    type="number"
+                    id="jp"
+                    min="1"
+                    max="10"
+                    value={data.jp}
+                    onChange={(e) => setData('jp', Number(e.target.value))}
+                    required
+                  />
+                  {errors.jp && <p className="text-sm text-red-500">{errors.jp}</p>}
+              </div>
+
+              <div className="space-y-2">
+                  <Label htmlFor="program_id">Program (Optional)</Label>
                   <Select
-                      id="faculty_id"
-                      value={data.faculty_id}
-                      onChange={(e) => setData('faculty_id', e.target.value)}
-                      required
+                      id="program_id"
+                      value={data.program_id}
+                      onChange={(e) => setData('program_id', e.target.value)}
                   >
-                      <option value="" disabled>Select a Faculty</option>
-                      {faculties.map(faculty => (
-                          <option key={faculty.faculty_id} value={faculty.faculty_id}>
-                              {faculty.faculty_name}
+                      <option value="">Umum (All Programs)</option>
+                      {programs.map(program => (
+                          <option key={program.program_id} value={program.program_id}>
+                              {program.program_name}
                           </option>
                       ))}
                   </Select>
-                  {errors.faculty_id && <p className="text-sm text-red-500">{errors.faculty_id}</p>}
+                  {errors.program_id && <p className="text-sm text-red-500">{errors.program_id}</p>}
               </div>
           </div>
         </Modal>
@@ -309,8 +346,8 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDeleteConfirm}
-          title="Delete Major?"
-          message={<>Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{selectedMajor?.major_name}</span>?</>}
+          title="Delete Subject?"
+          message={<>Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{selectedSubject?.subject_name}</span>?</>}
           confirmLabel={processing ? "Deleting..." : "Delete"}
           variant="danger"
         />
@@ -327,4 +364,4 @@ const MajorIndex: React.FC<IndexProps> = ({ auth, majors, faculties, filters, fl
   );
 };
 
-export default MajorIndex;
+export default SubjectIndex;

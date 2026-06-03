@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id('enrollment_id'); 
-            $table->foreignId('class_id')->constrained('course_classes', 'class_id');
+            $table->foreignId('rombel_id')->constrained('rombels', 'rombel_id');
             $table->foreignId('student_id')->constrained('users', 'user_id');
             $table->date('enrollment_date');
             $table->enum('status', ['active', 'dropped', 'completed'])->default('active');

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('curriculums', function (Blueprint $table) {
             $table->id('curriculum_id');
-            $table->foreignId('major_id')->constrained('majors', 'major_id');
-            $table->foreignId('course_id')->constrained('courses', 'course_id');
+            $table->foreignId('program_id')->constrained('programs', 'program_id');
+            $table->foreignId('subject_id')->constrained('subjects', 'subject_id');
             $table->integer('semester');
             $table->enum('category', ['MKU', 'WAJIB_PRODI', 'WAJIB_FAKULTAS', 'PILIHAN']);
             $table->timestamps();

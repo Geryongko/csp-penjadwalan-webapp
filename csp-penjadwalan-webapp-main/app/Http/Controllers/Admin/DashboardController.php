@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Course;
+use App\Models\Subject;
 use App\Models\Payment;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -24,7 +24,7 @@ class DashboardController extends Controller
 
         $totalLecturers = User::where('role_id', 2)->count();
 
-        $activeCourses = Course::count();
+        $activeSubjects = Subject::count();
 
 
         $recentPayments = Payment::with('student')
@@ -55,8 +55,8 @@ class DashboardController extends Controller
                 'lecturers' => [
                     'total' => $totalLecturers,
                 ],
-                'courses' => [
-                    'total' => $activeCourses,
+                'subjects' => [
+                    'total' => $activeSubjects,
                 ],
             ],
 

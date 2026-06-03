@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('lecturer_profiles', function (Blueprint $table) {
             $table->foreignId('user_id')->primary()->constrained('users', 'user_id')->cascadeOnDelete();
             $table->string('lecturer_number', 20)->unique();
-            $table->foreignId('faculty_id')->constrained('faculties', 'faculty_id');
+
             $table->string('title', 100)->nullable();
             $table->string('position', 100)->nullable();
             $table->string('office_room', 50)->nullable();

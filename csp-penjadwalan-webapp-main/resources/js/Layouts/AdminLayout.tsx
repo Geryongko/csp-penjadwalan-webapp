@@ -69,22 +69,16 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
             icon: 'school',
             children: [
                 {
-                    id: route('admin.faculties.index'),
-                    label: t('Faculties'),
-                    icon: 'domain',
-                    active: component.startsWith('Admin/Faculties')
-                },
-                {
-                    id: route('admin.majors.index'),
-                    label: t('Majors'),
+                    id: route('admin.programs.index'),
+                    label: t('Programs'),
                     icon: 'school',
-                    active: component.startsWith('Admin/Majors')
+                    active: component.startsWith('Admin/Programs')
                 },
                 {
-                    id: route('admin.courses.index'),
-                    label: t('Courses'),
+                    id: route('admin.subjects.index'),
+                    label: t('Subjects'),
                     icon: 'menu_book',
-                    active: component.startsWith('Admin/Courses')
+                    active: component.startsWith('Admin/Subjects')
                 },
                 {
                     id: route('admin.rooms.index'),
@@ -93,10 +87,10 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
                     active: component.startsWith('Admin/Rooms')
                 },
                 {
-                    id: route('admin.classes.index'),
-                    label: t('Classes'),
+                    id: route('admin.rombels.index'),
+                    label: t('Rombels'),
                     icon: 'class',
-                    active: component.startsWith('Admin/Classes')
+                    active: component.startsWith('Admin/Rombels')
                 },
                 {
                     id: route('admin.semesters.index'),

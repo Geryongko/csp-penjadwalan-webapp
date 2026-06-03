@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('courses', function (Blueprint $table) {
-            $table->id('course_id');
-            $table->string('course_code')->unique();
-            $table->string('course_name');
-            $table->integer('sks');
-            $table->foreignId('faculty_id')->constrained('faculties', 'faculty_id');
-            $table->foreignId('major_id')->constrained('majors', 'major_id');
+        Schema::create('subjects', function (Blueprint $table) {
+            $table->id('subject_id');
+            $table->string('subject_code')->unique();
+            $table->string('subject_name');
+            $table->integer('jp'); // Jam Pelajaran
+            $table->foreignId('program_id')->nullable()->constrained('programs', 'program_id');
             $table->text('description')->nullable();
             $table->timestamps();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('courses');
+        Schema::dropIfExists('subjects');
     }
 };

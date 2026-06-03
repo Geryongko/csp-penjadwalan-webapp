@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('forum_threads', function (Blueprint $table) {
             $table->id('thread_id');
-            $table->foreignId('class_id')
-                  ->constrained('course_classes', 'class_id')
+            $table->foreignId('rombel_id')
+                  ->constrained('rombels', 'rombel_id')
                   ->cascadeOnDelete();
             $table->foreignId('session_id')
                   ->nullable()

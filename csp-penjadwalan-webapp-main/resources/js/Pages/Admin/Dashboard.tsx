@@ -20,7 +20,7 @@ interface DashboardProps {
     stats: {
         students: { total: number; new_this_month: number; };
         lecturers: { total: number; };
-        courses: { total: number; };
+        subjects: { total: number; };
     };
     recentPayments: PaymentItem[];
 }
@@ -76,8 +76,8 @@ const Dashboard: React.FC<DashboardProps> = ({ auth, stats, recentPayments }) =>
             color="warning"
           />
           <StatsCard
-            title={t('Active Courses')}
-            value={stats.courses.total.toString()}
+            title={t('Active Subjects')}
+            value={stats.subjects?.total?.toString() || "0"}
             trend={t('Current Curriculum')}
             trendType="neutral"
             icon="menu_book"

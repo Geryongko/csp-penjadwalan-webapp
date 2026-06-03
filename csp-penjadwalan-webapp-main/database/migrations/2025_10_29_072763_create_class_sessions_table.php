@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('class_sessions', function (Blueprint $table) {
             $table->id('session_id'); 
-            $table->foreignId('class_id')
-                  ->constrained('course_classes', 'class_id')
+            $table->foreignId('rombel_id')
+                  ->constrained('rombels', 'rombel_id')
                   ->cascadeOnDelete();
             $table->integer('session_number');
             $table->date('session_date');

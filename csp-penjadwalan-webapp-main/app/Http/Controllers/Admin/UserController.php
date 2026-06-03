@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Faculty;
-use App\Models\Major;
+
+use App\Models\Program;
 use App\Models\Semester;
 use App\Models\StudentProfile;
 use App\Models\LecturerProfile;
@@ -36,8 +36,8 @@ class UserController extends Controller
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
             'filters' => $filters,
-            'faculties' => Faculty::all(['faculty_id', 'faculty_name']),
-            'majors' => Major::all(['major_id', 'major_name', 'faculty_id']),
+            'faculties' => Program::all(['program_id', 'faculty_name']),
+            'majors' => Major::all(['program_id', 'major_name', 'program_id']),
             'semesters' => Semester::all(['semester_id', 'semester_name', 'academic_year', 'term']),
         ]);
     }
@@ -78,8 +78,8 @@ class UserController extends Controller
 
         if ($request->role_id == 3) {
              $request->validate([
-                'faculty_id' => 'required|exists:faculties,faculty_id',
-                'major_id' => 'required|exists:majors,major_id',
+                'program_id' => 'required|exists:faculties,program_id',
+                'program_id' => 'required|exists:majors,program_id',
                 'semester_id' => 'required|exists:semesters,semester_id',
                 'batch_year' => 'required|integer|digits:4',
             ]);
@@ -89,8 +89,8 @@ class UserController extends Controller
 
             $user->studentProfile()->create([
                 'student_number' => $generatedNIM,
-                'faculty_id' => $request->faculty_id,
-                'major_id' => $request->major_id,
+                'program_id' => $request->program_id,
+                'program_id' => $request->program_id,
                 'semester_id' => $request->semester_id,
                 'batch_year' => $request->batch_year,
             ]);
@@ -98,14 +98,14 @@ class UserController extends Controller
 
         if ($request->role_id == 2) {
              $request->validate([
-                'faculty_id' => 'required|exists:faculties,faculty_id',
+                'program_id' => 'required|exists:faculties,program_id',
             ]);
             $runningNumber = LecturerProfile::count() + 1;
             $generatedNIDN = 'D' . str_pad($runningNumber, 6, '0', STR_PAD_LEFT);
 
             $user->lecturerProfile()->create([
                 'lecturer_number' => $generatedNIDN,
-                'faculty_id' => $request->faculty_id,
+                'program_id' => $request->program_id,
                 'title' => $request->title,
                 'position' => $request->position,
             ]);
@@ -154,8 +154,8 @@ class UserController extends Controller
 
         if ($user->role_id == 3) {
              $request->validate([
-                'faculty_id' => 'required|exists:faculties,faculty_id',
-                'major_id' => 'required|exists:majors,major_id',
+                'program_id' => 'required|exists:faculties,program_id',
+                'program_id' => 'required|exists:majors,program_id',
                 'semester_id' => 'required|exists:semesters,semester_id',
                 'batch_year' => 'required|integer|digits:4',
             ]);
@@ -163,8 +163,8 @@ class UserController extends Controller
                 ['user_id' => $user->user_id],
                 [
                     'student_number' => $user->studentProfile->student_number ?? ($request->batch_year . str_pad(StudentProfile::where('batch_year', $request->batch_year)->count() + 1, 4, '0', STR_PAD_LEFT)),
-                    'faculty_id' => $request->faculty_id,
-                    'major_id' => $request->major_id,
+                    'program_id' => $request->program_id,
+                    'program_id' => $request->program_id,
                     'semester_id' => $request->semester_id,
                     'batch_year' => $request->batch_year,
                 ]
@@ -173,13 +173,13 @@ class UserController extends Controller
 
         if ($user->role_id == 2) {
              $request->validate([
-                'faculty_id' => 'required|exists:faculties,faculty_id',
+                'program_id' => 'required|exists:faculties,program_id',
             ]);
             $user->lecturerProfile()->updateOrCreate(
                 ['user_id' => $user->user_id],
                 [
                     'lecturer_number' => $user->lecturerProfile->lecturer_number ?? ('D' . str_pad(LecturerProfile::count() + 1, 6, '0', STR_PAD_LEFT)),
-                    'faculty_id' => $request->faculty_id,
+                    'program_id' => $request->program_id,
                     'title' => $request->title,
                     'position' => $request->position,
                 ]
