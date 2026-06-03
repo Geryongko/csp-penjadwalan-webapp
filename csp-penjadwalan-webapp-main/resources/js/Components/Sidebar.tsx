@@ -48,7 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({ navItems, onNavigate }) => {
                 <Icon name="school" className="text-2xl" />
             </div>
             <div className="flex flex-col overflow-hidden">
-              <h1 className="text-gray-900 dark:text-white text-base font-bold leading-normal truncate">StudyFlow</h1>
+              <h1 className="text-gray-900 dark:text-white text-base font-bold leading-normal truncate">EduPlanner</h1>
             </div>
           </div>
 

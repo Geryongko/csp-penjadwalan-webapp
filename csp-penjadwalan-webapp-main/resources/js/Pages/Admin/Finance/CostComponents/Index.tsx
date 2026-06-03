@@ -53,7 +53,7 @@ const CostComponentIndex: React.FC<IndexProps> = ({ auth, components, filters, f
   const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
     component_code: '',
     component_name: '',
-    billing_type: 'PER_SEMESTER',
+    billing_type: 'MONTHLY',
     amount: 0,
   });
 
@@ -111,8 +111,7 @@ const CostComponentIndex: React.FC<IndexProps> = ({ auth, components, filters, f
 
   const getBillingBadge = (type: string) => {
       switch(type) {
-          case 'PER_SKS': return 'info';
-          case 'PER_SEMESTER': return 'primary';
+          case 'MONTHLY': return 'primary';
           case 'ONE_TIME': return 'warning';
           default: return 'gray';
       }
@@ -184,9 +183,7 @@ const CostComponentIndex: React.FC<IndexProps> = ({ auth, components, filters, f
                   <div className="space-y-2">
                       <Label htmlFor="billing_type">Billing Type</Label>
                       <Select id="billing_type" value={data.billing_type} onChange={(e) => setData('billing_type', e.target.value)} required>
-                          <option value="PER_SEMESTER">Per Semester</option>
-                          <option value="PER_SKS">Per SKS</option>
-                          <option value="PER_COURSE">Per Mata Kuliah</option>
+                          <option value="MONTHLY">Bulanan (Monthly)</option>
                           <option value="ONE_TIME">Sekali Bayar (One Time)</option>
                       </Select>
                       {errors.billing_type && <p className="text-sm text-red-500">{errors.billing_type}</p>}

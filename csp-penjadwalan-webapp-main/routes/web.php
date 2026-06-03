@@ -73,6 +73,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('teaching-assignments', App\Http\Controllers\Admin\TeachingAssignmentController::class)->only(['index', 'store', 'update', 'destroy']);
         
         Route::resource('cost_components', App\Http\Controllers\Admin\CostComponentController::class)->except(['show']);
+        
+        // Admin Billings
+        Route::get('billings', [App\Http\Controllers\Admin\BillingController::class, 'index'])->name('billings.index');
+        Route::post('billings', [App\Http\Controllers\Admin\BillingController::class, 'store'])->name('billings.store');
     });
 
     Route::middleware(['auth', 'verified', 'teacher'])->prefix('teacher')->name('teacher.')->group(function () {

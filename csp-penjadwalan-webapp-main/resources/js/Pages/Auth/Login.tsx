@@ -42,15 +42,15 @@ const Login: React.FC = () => {
                 <Icon name="school" className="text-5xl text-blue-200" />
             </div>
 
-            <h1 className="text-5xl font-bold mb-4 tracking-tight">
-                Universitas Shane
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 tracking-tight">
+                Sekolah Katolik Rajawali Makassar
             </h1>
             <h2 className="text-2xl font-light text-blue-200 mb-8">
                 Academic Portal
             </h2>
 
             <p className="text-blue-100/80 text-lg leading-relaxed">
-                Akses seluruh layanan akademik Anda dalam satu platform terintegrasi. Kelola KRS, lihat nilai, dan pembayaran SPP dengan mudah.
+                Akses seluruh layanan akademik Anda dalam satu platform terintegrasi. Kelola jadwal pelajaran, lihat nilai, dan pembayaran SPP dengan mudah.
             </p>
          </div>
       </div>

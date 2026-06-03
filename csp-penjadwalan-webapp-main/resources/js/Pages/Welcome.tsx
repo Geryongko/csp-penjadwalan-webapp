@@ -35,7 +35,7 @@ const Welcome: React.FC = () => {
 
   return (
     <>
-    <Head title="Welcome - Universitas Shane" />
+    <Head title="Welcome - Sekolah Katolik Rajawali Makassar" />
 
     <div className="min-h-screen bg-white dark:bg-background-dark text-gray-900 dark:text-white flex flex-col font-sans transition-colors duration-200">
 
@@ -45,7 +45,7 @@ const Welcome: React.FC = () => {
              <Icon name="school" className="text-2xl" />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-bold tracking-tight leading-none text-[#0A2647] dark:text-white">Universitas Shane</span>
+            <span className="text-lg font-bold tracking-tight leading-none text-[#0A2647] dark:text-white">Sekolah Katolik Rajawali Makassar</span>
             <span className="text-xs text-gray-500 font-medium tracking-wide uppercase">Official Portal</span>
           </div>
         </div>
@@ -73,11 +73,11 @@ const Welcome: React.FC = () => {
 
             <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-6 text-[#0A2647] dark:text-white">
                 Sistem Informasi Akademik <br/>
-                <span className="text-primary">Universitas Shane</span>
+                <span className="text-primary">Sekolah Katolik Rajawali Makassar</span>
             </h1>
 
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-                Selamat datang di portal layanan akademik terpadu. Silakan login untuk mengakses KRS, KHS, Jadwal Kuliah, dan layanan administrasi lainnya.
+                Selamat datang di portal layanan akademik. Silakan login untuk mengakses Jadwal Pelajaran, Nilai Siswa, dan layanan administrasi sekolah lainnya.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -96,8 +96,8 @@ const Welcome: React.FC = () => {
       <footer className="bg-white dark:bg-[#151d25] border-t border-gray-200 dark:border-gray-800 py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
-                <p className="text-sm font-bold text-gray-900 dark:text-white">Universitas Shane</p>
-                <p className="text-xs text-gray-500 mt-1">Jl. Pendidikan No. 1, Jakarta Selatan</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white">Sekolah Katolik Rajawali Makassar</p>
+                <p className="text-xs text-gray-500 mt-1">Makassar, Sulawesi Selatan</p>
             </div>
 
             <div className="flex items-center gap-6">
@@ -108,7 +108,7 @@ const Welcome: React.FC = () => {
 
             <div className="text-xs text-gray-400 flex items-center gap-1">
                 <span>Powered by</span>
-                <strong className="text-primary/80">StudyFlow</strong>
+                <strong className="text-primary/80">EduPlanner</strong>
             </div>
         </div>
       </footer>

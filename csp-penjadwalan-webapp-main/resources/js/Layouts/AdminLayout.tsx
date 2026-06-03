@@ -127,6 +127,12 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
                     label: t('Cost Components'),
                     icon: 'monetization_on',
                     active: component.startsWith('Admin/Finance/CostComponents')
+                },
+                {
+                    id: route('admin.billings.index'),
+                    label: t('Student Billings'),
+                    icon: 'receipt_long',
+                    active: component.startsWith('Admin/Billings')
                 }
             ]
         }

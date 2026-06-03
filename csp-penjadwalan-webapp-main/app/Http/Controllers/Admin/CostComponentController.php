@@ -32,7 +32,7 @@ class CostComponentController extends Controller
         $request->validate([
             'component_name' => 'required|string|max:255',
             'component_code' => 'required|string|max:50|unique:cost_components,component_code',
-            'billing_type'   => 'required|in:PER_SKS,PER_COURSE,PER_SEMESTER,ONE_TIME',
+            'billing_type'   => 'required|in:MONTHLY,ONE_TIME',
             'amount'         => 'required|numeric|min:0',
         ]);
 
@@ -50,7 +50,7 @@ class CostComponentController extends Controller
                 'required', 'string', 'max:50',
                 Rule::unique('cost_components')->ignore($costComponent->cost_component_id, 'cost_component_id')
             ],
-            'billing_type'   => 'required|in:PER_SKS,PER_COURSE,PER_SEMESTER,ONE_TIME',
+            'billing_type'   => 'required|in:MONTHLY,ONE_TIME',
             'amount'         => 'required|numeric|min:0',
         ]);
 

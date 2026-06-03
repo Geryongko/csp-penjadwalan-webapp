@@ -41,4 +41,9 @@ class Billing extends Model
     {
         return $this->hasMany(PaymentDetail::class, 'billing_id', 'billing_id');
     }
+
+    public function student()
+    {
+        return $this->belongsTo(User::class, 'student_id', 'user_id');
+    }
 }
