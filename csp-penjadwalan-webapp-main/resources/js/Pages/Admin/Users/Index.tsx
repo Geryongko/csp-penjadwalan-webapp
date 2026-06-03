@@ -1,8 +1,8 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import { debounce } from 'lodash';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { User, Faculty, Major, Semester } from '../../../types';
+import { User, Program, Semester } from '../../../types';
 import Icon from '../../../Components/Icon';
 import {
   PageHeader,
@@ -13,7 +13,7 @@ import {
   Modal,
   ConfirmationModal,
   FeedbackModal,
-  Input, Label, Select, Pagination
+  Input, Label, Select
 } from '../../../Components/ReusableUI';
 import useTranslation from '../../../Hooks/useTranslation';
 
@@ -25,8 +25,7 @@ interface IndexProps {
     from: number;
     total: number;
   };
-  faculties: Faculty[];
-  majors: Major[];
+  programs: Program[];
   semesters: Semester[];
   filters: {
     search?: string;
@@ -38,7 +37,7 @@ interface IndexProps {
   };
 }
 
-const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semesters, filters, flash = {} }) => {
+const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, filters, flash = {} }) => {
   const { t } = useTranslation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,19 +72,13 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
     birth_date: '',
     profile_picture: null as File | null,
 
-    faculty_id: '',
-    major_id: '',
+    program_id: '',
     semester_id: '',
     batch_year: new Date().getFullYear().toString(),
 
     title: '',
     position: '',
   });
-
-  const availableMajors = useMemo(() => {
-    if (!data.faculty_id) return [];
-    return majors.filter(m => String(m.faculty_id) === String(data.faculty_id));
-  }, [data.faculty_id, majors]);
 
   const handleOpenAddModal = () => {
     setModalMode('add');
@@ -105,7 +98,6 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
   const handleOpenEditModal = (user: User) => {
     setModalMode('edit');
     setAddStep('form');
-
     setPreviewImage(null);
 
     let formData = {
@@ -116,10 +108,9 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
         role_id: user.role_id,
         phone_number: user.phone_number || '',
         birth_date: user.birth_date ? user.birth_date.split('T')[0] : '',
-        profile_picture: null,
+        profile_picture: null as File | null,
 
-        faculty_id: '',
-        major_id: '',
+        program_id: '',
         semester_id: '',
         batch_year: '',
         title: '',
@@ -127,16 +118,13 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
     };
 
     if (user.role_id === 3 && user.student_profile) {
-        formData.faculty_id = String(user.student_profile.faculty_id);
-        formData.major_id = String(user.student_profile.major_id);
+        formData.program_id = String(user.student_profile.program_id);
         formData.semester_id = String(user.student_profile.semester_id);
         formData.batch_year = String(user.student_profile.batch_year);
     } else if (user.role_id === 2 && user.lecturer_profile) {
-        formData.faculty_id = String(user.lecturer_profile.faculty_id);
         formData.title = user.lecturer_profile.title || '';
         formData.position = user.lecturer_profile.position || '';
     }
-
 
     setData(formData);
     clearErrors();
@@ -196,16 +184,10 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
   const onSearchChange = (val: string) => { setSearchQuery(val); applyFilters(val, roleFilter); };
   const onRoleFilterChange = (val: string) => { setRoleFilter(val); applyFilters(searchQuery, val); };
 
-  const getRoleName = (id: number) => {
-      if (id === 1) return 'Admin';
-      if (id === 2) return 'Lecturer';
-      return 'Student';
-  };
-
   const getRoleDisplayName = (id: number) => {
       if (id === 1) return t('Administrator');
-      if (id === 2) return t('Lecturer');
-      return t('Student');
+      if (id === 2) return t('Guru');
+      return t('Siswa');
   };
 
   const getRoleBadgeVariant = (id: number) => {
@@ -220,13 +202,13 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
               <div className="size-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
                   <Icon name="school" className="text-4xl" />
               </div>
-              <div className="text-center"><h3 className="font-bold text-gray-900 dark:text-white">{t('Student')}</h3><p className="text-sm text-gray-500">{t('Active Students')}</p></div>
+              <div className="text-center"><h3 className="font-bold text-gray-900 dark:text-white">{t('Siswa')}</h3><p className="text-sm text-gray-500">{t('Active Students')}</p></div>
           </div>
           <div onClick={() => handleSelectRole(2)} className="cursor-pointer border-2 border-gray-200 dark:border-gray-700 hover:border-yellow-500 bg-white dark:bg-gray-800 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:shadow-lg group">
               <div className="size-16 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600 dark:text-yellow-400 group-hover:scale-110 transition-transform">
                   <Icon name="cast_for_education" className="text-4xl" />
               </div>
-              <div className="text-center"><h3 className="font-bold text-gray-900 dark:text-white">{t('Lecturer')}</h3><p className="text-sm text-gray-500">{t('Faculty Members')}</p></div>
+              <div className="text-center"><h3 className="font-bold text-gray-900 dark:text-white">{t('Guru')}</h3><p className="text-sm text-gray-500">{t('Teachers')}</p></div>
           </div>
           <div onClick={() => handleSelectRole(1)} className="cursor-pointer border-2 border-gray-200 dark:border-gray-700 hover:border-red-500 bg-white dark:bg-gray-800 p-6 rounded-xl flex flex-col items-center gap-4 transition-all hover:shadow-lg group">
               <div className="size-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform">
@@ -239,7 +221,6 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
 
   const renderFormContent = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
         <div className="space-y-4">
             <h4 className="font-bold text-gray-900 dark:text-white border-b pb-2 flex items-center gap-2">
                 <Icon name="account_circle" className="text-gray-500" /> {t('Account Info')}
@@ -332,20 +313,12 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
             {data.role_id === 3 && (
                 <>
                     <div className="space-y-2">
-                        <Label>{t('Faculty')}</Label>
-                        <Select value={data.faculty_id} onChange={e => setData('faculty_id', e.target.value)} required>
-                            <option value="" disabled>{t('Select Faculty')}</option>
-                            {faculties.map(f => <option key={f.faculty_id} value={f.faculty_id}>{f.faculty_name}</option>)}
+                        <Label>{t('Peminatan')}</Label>
+                        <Select value={data.program_id} onChange={e => setData('program_id', e.target.value)} required>
+                            <option value="" disabled>{t('Select Peminatan')}</option>
+                            {programs.map(p => <option key={p.program_id} value={p.program_id}>{p.program_name}</option>)}
                         </Select>
-                        {errors.faculty_id && <p className="text-sm text-red-500">{errors.faculty_id}</p>}
-                    </div>
-                    <div className="space-y-2">
-                        <Label>{t('Major')}</Label>
-                        <Select value={data.major_id} onChange={e => setData('major_id', e.target.value)} required disabled={!data.faculty_id}>
-                            <option value="" disabled>{t('Select Major')}</option>
-                            {availableMajors.map(m => <option key={m.major_id} value={m.major_id}>{m.major_name}</option>)}
-                        </Select>
-                        {errors.major_id && <p className="text-sm text-red-500">{errors.major_id}</p>}
+                        {errors.program_id && <p className="text-sm text-red-500">{errors.program_id}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -368,20 +341,12 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
             {data.role_id === 2 && (
                 <>
                     <div className="space-y-2">
-                        <Label>{t('Faculty')}</Label>
-                        <Select value={data.faculty_id} onChange={e => setData('faculty_id', e.target.value)} required>
-                            <option value="" disabled>{t('Select Faculty')}</option>
-                            {faculties.map(f => <option key={f.faculty_id} value={f.faculty_id}>{f.faculty_name}</option>)}
-                        </Select>
-                        {errors.faculty_id && <p className="text-sm text-red-500">{errors.faculty_id}</p>}
+                        <Label>{t('Gelar Akademik')}</Label>
+                        <Input type="text" value={data.title} onChange={e => setData('title', e.target.value)} placeholder="e.g. S.Pd., M.Pd." />
                     </div>
                     <div className="space-y-2">
-                        <Label>{t('Academic Title')}</Label>
-                        <Input type="text" value={data.title} onChange={e => setData('title', e.target.value)} placeholder="e.g. M.Sc., Ph.D." />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>{t('Position')}</Label>
-                        <Input type="text" value={data.position} onChange={e => setData('position', e.target.value)} placeholder="e.g. Senior Lecturer" />
+                        <Label>{t('Jabatan')}</Label>
+                        <Input type="text" value={data.position} onChange={e => setData('position', e.target.value)} placeholder="e.g. Guru Matematika" />
                     </div>
                 </>
             )}
@@ -416,7 +381,7 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
           <Thead>
               <Th>{t('User')}</Th>
               <Th>{t('Role')}</Th>
-              <Th>{t('ID (NIM/NIDN)')}</Th>
+              <Th>{t('ID (NIS/NIP)')}</Th>
               <Th>{t('Affiliation')}</Th>
               <Th>{t('Actions')}</Th>
           </Thead>
@@ -443,8 +408,8 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, faculties, majors, semes
                        user.role_id === 2 ? user.lecturer_profile?.lecturer_number : '-'}
                   </Td>
                   <Td className="text-gray-600 dark:text-gray-300 text-sm">
-                      {user.role_id === 3 ? user.student_profile?.major?.major_name :
-                       user.role_id === 2 ? user.lecturer_profile?.faculty?.faculty_name : 'System Admin'}
+                      {user.role_id === 3 ? user.student_profile?.program?.program_name :
+                       user.role_id === 2 ? (user.lecturer_profile?.position || 'Guru') : 'System Admin'}
                   </Td>
                   <Td>
                     <div className="flex items-center gap-4">

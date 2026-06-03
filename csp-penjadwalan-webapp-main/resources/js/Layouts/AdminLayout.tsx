@@ -87,10 +87,10 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
                     active: component.startsWith('Admin/Rooms')
                 },
                 {
-                    id: route('admin.rombels.index'),
-                    label: t('Rombels'),
+                    label: t('Classes'),
                     icon: 'class',
-                    active: component.startsWith('Admin/Rombels')
+                    id: route('admin.classes.index'),
+                    active: component.startsWith('Admin/Classes')
                 },
                 {
                     id: route('admin.semesters.index'),
@@ -103,6 +103,18 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
                     label: t('Curriculums'),
                     icon: 'account_tree',
                     active: component.startsWith('Admin/Curriculums')
+                },
+                {
+                    id: route('admin.teaching-assignments.index'),
+                    label: t('Teaching Assignments'),
+                    icon: 'assignment_ind',
+                    active: component.startsWith('Admin/TeachingAssignments')
+                },
+                {
+                    id: route('admin.schedules.index'),
+                    label: t('AI Timetable (CSP)'),
+                    icon: 'smart_toy',
+                    active: component.startsWith('Admin/Schedules')
                 }
             ]
         },

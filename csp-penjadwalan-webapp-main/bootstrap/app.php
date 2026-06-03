@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             'admin' => \App\Http\Middleware\CheckAdminRole::class,
             'student' => \App\Http\Middleware\CheckStudentRole::class,
+            'teacher' => \App\Http\Middleware\CheckTeacherRole::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

@@ -25,7 +25,7 @@ class UserController extends Controller
 
         $users = User::query()
             ->where('role_id', $roleId)
-            ->with(['studentProfile.major', 'lecturerProfile.faculty'])
+            ->with(['studentProfile.program', 'lecturerProfile'])
             ->when($request->input('search'), function ($query, $search) {
                 $query->where('full_name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
@@ -36,8 +36,7 @@ class UserController extends Controller
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
             'filters' => $filters,
-            'faculties' => Program::all(['program_id', 'faculty_name']),
-            'majors' => Major::all(['program_id', 'major_name', 'program_id']),
+            'programs' => Program::all(['program_id', 'program_name']),
             'semesters' => Semester::all(['semester_id', 'semester_name', 'academic_year', 'term']),
         ]);
     }
@@ -51,16 +50,12 @@ class UserController extends Controller
             'role_id' => 'required|integer|in:1,2,3',
             'phone_number' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date',
-
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-
         $profilePicturePath = null;
         if ($request->hasFile('profile_picture')) {
-
             $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-
             $profilePicturePath = '/storage/' . $path;
         }
 
@@ -75,11 +70,9 @@ class UserController extends Controller
             'profile_picture' => $profilePicturePath,
         ]);
 
-
         if ($request->role_id == 3) {
              $request->validate([
-                'program_id' => 'required|exists:faculties,program_id',
-                'program_id' => 'required|exists:majors,program_id',
+                'program_id' => 'required|exists:programs,program_id',
                 'semester_id' => 'required|exists:semesters,semester_id',
                 'batch_year' => 'required|integer|digits:4',
             ]);
@@ -90,22 +83,17 @@ class UserController extends Controller
             $user->studentProfile()->create([
                 'student_number' => $generatedNIM,
                 'program_id' => $request->program_id,
-                'program_id' => $request->program_id,
                 'semester_id' => $request->semester_id,
                 'batch_year' => $request->batch_year,
             ]);
         }
 
         if ($request->role_id == 2) {
-             $request->validate([
-                'program_id' => 'required|exists:faculties,program_id',
-            ]);
             $runningNumber = LecturerProfile::count() + 1;
-            $generatedNIDN = 'D' . str_pad($runningNumber, 6, '0', STR_PAD_LEFT);
+            $generatedNIDN = 'G' . str_pad($runningNumber, 6, '0', STR_PAD_LEFT);
 
             $user->lecturerProfile()->create([
                 'lecturer_number' => $generatedNIDN,
-                'program_id' => $request->program_id,
                 'title' => $request->title,
                 'position' => $request->position,
             ]);
@@ -122,7 +110,6 @@ class UserController extends Controller
             'role_id' => 'required|integer|in:1,2,3',
             'phone_number' => 'nullable|string|max:20',
             'birth_date' => 'nullable|date',
-
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -133,29 +120,22 @@ class UserController extends Controller
             'birth_date' => $request->birth_date,
         ];
 
-
         if ($request->hasFile('profile_picture')) {
-
             if ($user->profile_picture) {
-
                 $oldPath = str_replace('/storage/', '', $user->profile_picture);
                 if (Storage::disk('public')->exists($oldPath)) {
                     Storage::disk('public')->delete($oldPath);
                 }
             }
-
-
             $path = $request->file('profile_picture')->store('profile_pictures', 'public');
             $userData['profile_picture'] = '/storage/' . $path;
         }
 
         $user->update($userData);
 
-
         if ($user->role_id == 3) {
              $request->validate([
-                'program_id' => 'required|exists:faculties,program_id',
-                'program_id' => 'required|exists:majors,program_id',
+                'program_id' => 'required|exists:programs,program_id',
                 'semester_id' => 'required|exists:semesters,semester_id',
                 'batch_year' => 'required|integer|digits:4',
             ]);
@@ -164,7 +144,6 @@ class UserController extends Controller
                 [
                     'student_number' => $user->studentProfile->student_number ?? ($request->batch_year . str_pad(StudentProfile::where('batch_year', $request->batch_year)->count() + 1, 4, '0', STR_PAD_LEFT)),
                     'program_id' => $request->program_id,
-                    'program_id' => $request->program_id,
                     'semester_id' => $request->semester_id,
                     'batch_year' => $request->batch_year,
                 ]
@@ -172,14 +151,10 @@ class UserController extends Controller
         }
 
         if ($user->role_id == 2) {
-             $request->validate([
-                'program_id' => 'required|exists:faculties,program_id',
-            ]);
             $user->lecturerProfile()->updateOrCreate(
                 ['user_id' => $user->user_id],
                 [
-                    'lecturer_number' => $user->lecturerProfile->lecturer_number ?? ('D' . str_pad(LecturerProfile::count() + 1, 6, '0', STR_PAD_LEFT)),
-                    'program_id' => $request->program_id,
+                    'lecturer_number' => $user->lecturerProfile->lecturer_number ?? ('G' . str_pad(LecturerProfile::count() + 1, 6, '0', STR_PAD_LEFT)),
                     'title' => $request->title,
                     'position' => $request->position,
                 ]

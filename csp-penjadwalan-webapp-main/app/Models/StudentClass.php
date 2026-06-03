@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Rombel extends Model
+class StudentClass extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'rombel_id';
+    protected $primaryKey = 'student_class_id';
 
     protected $fillable = [
-        'rombel_name',
+        'class_name',
         'grade_level',
         'program_id',
         'homeroom_teacher_id',

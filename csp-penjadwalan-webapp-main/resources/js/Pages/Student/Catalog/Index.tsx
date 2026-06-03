@@ -13,12 +13,8 @@ interface CatalogItem {
   id: number;
   code: string;
   name: string;
-  sks: number;
   semester: number;
-  category: string;
-  status: 'Passed' | 'Taken' | 'Available';
-  grade: string;
-  prerequisite?: string;
+  teacher_name: string;
 }
 
 interface CatalogProps {
@@ -26,7 +22,7 @@ interface CatalogProps {
     catalog: CatalogItem[];
 }
 
-const SEMESTERS = [1, 2, 3, 4, 5, 6, 7, 8];
+const SEMESTERS = [1, 2];
 
 const CatalogIndex: React.FC<CatalogProps> = ({ auth, catalog }) => {
   const [expandedSemesters, setExpandedSemesters] = useState<number[]>([]);
@@ -55,23 +51,6 @@ const CatalogIndex: React.FC<CatalogProps> = ({ auth, catalog }) => {
     );
   };
 
-  const getStatusBadgeVariant = (status: string, grade: string) => {
-    if (status === 'Passed') return 'success';
-    if (status === 'Taken') return 'primary';
-    if (status === 'Available' && grade !== '-') return 'warning';
-    return 'gray';
-  };
-
-  const formatCategory = (cat: string) => {
-      const map: Record<string, string> = {
-          'WAJIB_PRODI': 'Major Compulsory',
-          'WAJIB_FAKULTAS': 'Faculty Compulsory',
-          'MKU': 'General Course',
-          'PILIHAN': 'Elective'
-      };
-      return map[cat] || cat.replace(/_/g, ' ');
-  };
-
   return (
     <StudentLayout user={auth.user}>
         <Head title="Course Catalog" />
@@ -91,7 +70,6 @@ const CatalogIndex: React.FC<CatalogProps> = ({ auth, catalog }) => {
         <div className="space-y-4">
             {SEMESTERS.map(sem => {
                 const semesterCourses = filteredCourses.filter(c => c.semester === sem);
-                const totalSks = semesterCourses.reduce((acc, curr) => acc + curr.sks, 0);
                 const isExpanded = expandedSemesters.includes(sem);
 
                 if (searchQuery && semesterCourses.length === 0) return null;
@@ -107,10 +85,10 @@ const CatalogIndex: React.FC<CatalogProps> = ({ auth, catalog }) => {
                                     <Icon name="chevron_right" />
                                 </div>
                                 <h3 className={`font-bold text-lg ${isExpanded ? 'text-primary' : 'text-gray-900 dark:text-white'}`}>
-                                    Semester {sem}
+                                    Semester {sem === 1 ? '1 (Ganjil)' : '2 (Genap)'}
                                 </h3>
                             </div>
-                            <Badge variant="gray">{totalSks} Total Credits</Badge>
+                            <Badge variant="gray">{semesterCourses.length} Subjects</Badge>
                         </button>
 
                         {isExpanded && (
@@ -119,36 +97,33 @@ const CatalogIndex: React.FC<CatalogProps> = ({ auth, catalog }) => {
                                     <table className="w-full text-left border-collapse">
                                         <thead>
                                             <tr className="bg-gray-50/50 dark:bg-background-dark/30 border-b border-gray-100 dark:border-gray-800">
-                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Code</th>
-                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Course Name</th>
-                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Credits</th>
-                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Type</th>
-                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase w-32">Code</th>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Subject Name</th>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Teacher</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                                             {semesterCourses.length > 0 ? (
                                                 semesterCourses.map(course => (
                                                     <tr key={course.id} className="hover:bg-gray-50 dark:hover:bg-background-dark/50">
-                                                        <td className="px-6 py-4 text-sm font-mono font-bold text-gray-700 dark:text-gray-300">{course.code}</td>
-                                                        <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{course.name}</td>
-                                                        <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">{course.sks}</td>
-                                                        <td className="px-6 py-4">
-                                                            <Badge variant="gray">{formatCategory(course.category)}</Badge>
+                                                        <td className="px-6 py-4 text-sm font-mono font-bold text-gray-700 dark:text-gray-300">
+                                                            {course.code}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                                                            {course.name}
                                                         </td>
                                                         <td className="px-6 py-4">
-                                                            <Badge variant={getStatusBadgeVariant(course.status, course.grade)}>
-                                                                {course.status === 'Passed' ? `Passed (${course.grade})` :
-                                                                 course.status === 'Taken' ? 'In Progress' :
-                                                                 course.grade !== '-' ? `Retake (${course.grade})` : 'Available'}
-                                                            </Badge>
+                                                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                                                <Icon name="person" className="text-[18px]" />
+                                                                {course.teacher_name}
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500 italic">
-                                                        No courses listed for this semester.
+                                                    <td colSpan={3} className="px-6 py-8 text-center text-gray-500 italic">
+                                                        No subjects listed for this semester.
                                                     </td>
                                                 </tr>
                                             )}

@@ -68,9 +68,9 @@ export interface User {
     lecturer_profile?: LecturerProfile;
 }
 
-export interface Rombel {
-  rombel_id: number;
-  rombel_name: string;
+export interface StudentClass {
+  student_class_id: number;
+  class_name: string;
   grade_level: number;
   
   program_id?: number;

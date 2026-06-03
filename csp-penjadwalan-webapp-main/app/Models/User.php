@@ -98,4 +98,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(StudentProfileInfo::class, 'user_id', 'user_id');
     }
+
+    /**
+     * Relasi ke Enrollments (Pendaftaran Kelas).
+     */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class, 'student_id', 'user_id');
+    }
 }

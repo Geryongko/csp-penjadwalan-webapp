@@ -5,7 +5,7 @@ import Sidebar from '@/Components/Sidebar';
 import Header from '@/Components/Header';
 import useTranslation from '@/Hooks/useTranslation';
 
-interface StudentLayoutProps {
+interface TeacherLayoutProps {
     children: React.ReactNode;
     user?: User;
 }
@@ -16,7 +16,7 @@ interface PageProps {
     [key: string]: any;
 }
 
-export default function StudentLayout({ children, user }: StudentLayoutProps) {
+export default function TeacherLayout({ children, user }: TeacherLayoutProps) {
     const { t } = useTranslation();
     const { props, component } = usePage<PageProps>();
     const currentUser = user || props.auth.user;
@@ -48,34 +48,10 @@ export default function StudentLayout({ children, user }: StudentLayoutProps) {
 
     const navItems: NavItem[] = useMemo(() => [
         {
-            id: route('student.dashboard'),
+            id: route('teacher.dashboard'),
             label: t('Dashboard'),
             icon: 'dashboard',
-            active: component === 'Student/Dashboard'
-        },
-        {
-            label: t('Academics'),
-            icon: 'school',
-            children: [
-                {
-                    label: t('List Courses'),
-                    icon: 'history_edu',
-                    id: route('student.catalog.index'),
-                    active: component.startsWith('Student/Catalog')
-                }
-            ]
-        },
-        {
-            label: t('Finance'),
-            icon: 'payments',
-            children: [
-                {
-                    label: t('Tuition Bills'),
-                    icon: 'receipt_long',
-                    id: route('student.billing.index'),
-                    active: component.startsWith('Student/Billing')
-                }
-            ]
+            active: component === 'Teacher/Dashboard'
         }
     ], [component, t]);
 
@@ -84,7 +60,8 @@ export default function StudentLayout({ children, user }: StudentLayoutProps) {
             router.post(route('logout'));
         }
         else if (destination === 'profile') {
-            router.get(route('student.profile.edit'));
+            // we will create teacher profile edit route later
+            // router.get(route('teacher.profile.edit'));
         }
         else if (destination && !destination.startsWith('#')) {
             router.visit(destination);
@@ -104,7 +81,7 @@ export default function StudentLayout({ children, user }: StudentLayoutProps) {
                     user={{
                         name: currentUser.full_name,
                         avatar: currentUser.profile_picture || '',
-                        role: 'Student'
+                        role: 'Teacher'
                     }}
                 />
                 <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">

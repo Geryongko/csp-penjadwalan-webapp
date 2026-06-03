@@ -11,11 +11,16 @@ export default {
         './resources/js/**/*.tsx',
     ],
 
+    darkMode: 'class',
     theme: {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                primary: '#2563eb', // blue-600
+                'background-dark': '#0f172a', // slate-900
+            }
         },
     },
 

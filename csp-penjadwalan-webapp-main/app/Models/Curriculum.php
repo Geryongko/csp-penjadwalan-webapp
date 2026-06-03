@@ -14,20 +14,19 @@ class Curriculum extends Model
     protected $primaryKey = 'curriculum_id';
 
     protected $fillable = [
-        'major_id',
-        'course_id',
+        'program_id',
+        'subject_id',
         'semester',
         'category',
-        'academic_year',
     ];
 
-    public function major(): BelongsTo
+    public function program(): BelongsTo
     {
-        return $this->belongsTo(Major::class, 'major_id', 'major_id');
+        return $this->belongsTo(Program::class, 'program_id', 'program_id');
     }
 
-    public function course(): BelongsTo
+    public function subject(): BelongsTo
     {
-        return $this->belongsTo(Course::class, 'course_id', 'course_id');
+        return $this->belongsTo(Subject::class, 'subject_id', 'subject_id');
     }
 }

@@ -19,12 +19,10 @@ class StudentProfile extends Model
 
 
     protected $appends = ['current_semester_level'];
-
     protected $fillable = [
         'user_id',
         'student_number',
-        'faculty_id',
-        'major_id',
+        'program_id',
         'semester_id',
         'batch_year',
         'gpa',
@@ -51,21 +49,14 @@ class StudentProfile extends Model
         return max(1, $semesterLevel);
     }
 
-
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    public function major(): BelongsTo
+    public function program(): BelongsTo
     {
-        return $this->belongsTo(Major::class, 'major_id', 'major_id');
-    }
-
-    public function faculty(): BelongsTo
-    {
-        return $this->belongsTo(Faculty::class, 'faculty_id', 'faculty_id');
+        return $this->belongsTo(Program::class, 'program_id', 'program_id');
     }
 
     public function semester(): BelongsTo

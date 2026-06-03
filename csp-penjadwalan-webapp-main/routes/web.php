@@ -35,6 +35,9 @@ Route::get('/', function () {
         if ($role == 1) {
             return redirect()->route('admin.dashboard');
         }
+        elseif ($role == 2) {
+            return redirect()->route('teacher.dashboard');
+        }
         elseif ($role == 3) {
             return redirect()->route('student.dashboard');
         }
@@ -53,18 +56,27 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         
+        Route::post('/schedules/generate', [\App\Http\Controllers\Admin\ScheduleController::class, 'generate'])->name('schedules.generate');
+        Route::get('/schedules', [\App\Http\Controllers\Admin\ScheduleController::class, 'index'])->name('schedules.index');
+
         Route::resource('users', App\Http\Controllers\Admin\UserController::class);
         Route::resource('programs', App\Http\Controllers\Admin\ProgramController::class)->except(['show']);
         Route::resource('rooms', App\Http\Controllers\Admin\RoomController::class)->except(['show']);
         Route::resource('semesters', App\Http\Controllers\Admin\SemesterController::class)->except(['show']);
         Route::resource('subjects', App\Http\Controllers\Admin\SubjectController::class)->except(['show']);
-        Route::resource('rombels', App\Http\Controllers\Admin\RombelController::class);
+        Route::resource('classes', App\Http\Controllers\Admin\StudentClassController::class);
         
         Route::get('curriculums', [App\Http\Controllers\Admin\CurriculumController::class, 'index'])->name('curriculums.index');
         Route::post('curriculums', [App\Http\Controllers\Admin\CurriculumController::class, 'store'])->name('curriculums.store');
         Route::delete('curriculums/{id}', [App\Http\Controllers\Admin\CurriculumController::class, 'destroy'])->name('curriculums.destroy');
         
+        Route::resource('teaching-assignments', App\Http\Controllers\Admin\TeachingAssignmentController::class)->only(['index', 'store', 'update', 'destroy']);
+        
         Route::resource('cost_components', App\Http\Controllers\Admin\CostComponentController::class)->except(['show']);
+    });
+
+    Route::middleware(['auth', 'verified', 'teacher'])->prefix('teacher')->name('teacher.')->group(function () {
+        Route::get('dashboard', [App\Http\Controllers\Teacher\DashboardController::class, 'index'])->name('dashboard');
     });
 
     Route::middleware(['auth', 'verified', 'student'])->prefix('student')->name('student.')->group(function () {

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rombels', function (Blueprint $table) {
-            $table->id('rombel_id');
-            $table->string('rombel_name', 20); // e.g. "X MIPA 1"
+        Schema::create('student_classes', function (Blueprint $table) {
+            $table->id('student_class_id');
+            $table->string('class_name', 20); // e.g. "X MIPA 1"
             $table->integer('grade_level'); // 10, 11, 12
             $table->foreignId('program_id')->nullable()->constrained('programs', 'program_id');
             $table->foreignId('homeroom_teacher_id')->nullable()->constrained('users', 'user_id'); // Wali Kelas
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rombels');
+        Schema::dropIfExists('student_classes');
     }
 };

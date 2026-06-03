@@ -17,20 +17,13 @@ class LecturerProfile extends Model
     protected $fillable = [
         'user_id',
         'lecturer_number',
-        'faculty_id',
         'title',
         'position',
         'office_room',
-        'address',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
-    }
-
-    public function faculty(): BelongsTo
-    {
-        return $this->belongsTo(Faculty::class, 'faculty_id', 'faculty_id');
     }
 }

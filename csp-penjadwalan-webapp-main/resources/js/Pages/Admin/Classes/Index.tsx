@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import { debounce } from 'lodash';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { Rombel, Program, User } from '../../../types';
+import { StudentClass, Program, User } from '../../../types';
 import Icon from '../../../Components/Icon';
 import {
   PageHeader,
@@ -17,8 +17,8 @@ import {
 
 interface IndexProps {
   auth: any;
-  rombels: {
-    data: Rombel[];
+  classes: {
+    data: StudentClass[];
     links: {
       url: string | null;
       label: string;
@@ -40,12 +40,12 @@ interface IndexProps {
   };
 }
 
-const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, filters, flash = {} }) => {
+const ClassIndex: React.FC<IndexProps> = ({ auth, classes, programs, teachers, filters, flash = {} }) => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-  const [selectedRombel, setSelectedRombel] = useState<Rombel | null>(null);
+  const [selectedClass, setSelectedClass] = useState<StudentClass | null>(null);
 
   const [searchQuery, setSearchQuery] = useState(filters.search || '');
   const [programFilter, setProgramFilter] = useState(filters.program_id || '');
@@ -83,7 +83,7 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
   }, [flash]);
 
   const { data, setData, post, put, delete: destroy, processing, errors, reset, clearErrors } = useForm({
-    rombel_name: '',
+    class_name: '',
     grade_level: 10,
     program_id: '',
     homeroom_teacher_id: '',
@@ -96,21 +96,21 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
     setIsModalOpen(true);
   };
 
-  const handleOpenEditModal = (rombel: Rombel) => {
+  const handleOpenEditModal = (cls: StudentClass) => {
     setModalMode('edit');
     setData({
-        rombel_name: rombel.rombel_name,
-        grade_level: rombel.grade_level,
-        program_id: rombel.program_id ? String(rombel.program_id) : '',
-        homeroom_teacher_id: rombel.homeroom_teacher_id ? String(rombel.homeroom_teacher_id) : '',
+        class_name: cls.class_name,
+        grade_level: cls.grade_level,
+        program_id: cls.program_id ? String(cls.program_id) : '',
+        homeroom_teacher_id: cls.homeroom_teacher_id ? String(cls.homeroom_teacher_id) : '',
     });
     clearErrors();
-    setSelectedRombel(rombel);
+    setSelectedClass(cls);
     setIsModalOpen(true);
   };
 
-  const handleOpenDeleteModal = (rombel: Rombel) => {
-    setSelectedRombel(rombel);
+  const handleOpenDeleteModal = (cls: StudentClass) => {
+    setSelectedClass(cls);
     setIsDeleteModalOpen(true);
   };
 
@@ -118,15 +118,15 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
     e.preventDefault();
 
     if (modalMode === 'add') {
-      post(route('admin.rombels.store'), {
+      post(route('admin.classes.store'), {
         onSuccess: () => {
           setIsModalOpen(false);
           reset();
         },
         preserveScroll: true
       });
-    } else if (selectedRombel) {
-      put(route('admin.rombels.update', selectedRombel.rombel_id), {
+    } else if (selectedClass) {
+      put(route('admin.classes.update', selectedClass.student_class_id), {
         onSuccess: () => {
           setIsModalOpen(false);
           reset();
@@ -137,8 +137,8 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
   };
 
   const handleDeleteConfirm = () => {
-    if (selectedRombel) {
-      destroy(route('admin.rombels.destroy', selectedRombel.rombel_id), {
+    if (selectedClass) {
+      destroy(route('admin.classes.destroy', selectedClass.student_class_id), {
         onSuccess: () => setIsDeleteModalOpen(false),
         preserveScroll: true
       });
@@ -148,7 +148,7 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
   const applyFilters = useCallback(
     debounce((search: string, program: string, grade: string) => {
       router.get(
-        route('admin.rombels.index'),
+        route('admin.classes.index'),
         { search, program_id: program, grade_level: grade },
         { preserveState: true, replace: true }
       );
@@ -173,20 +173,20 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
 
   return (
     <AdminLayout user={auth.user}>
-      <Head title="Manage Rombels" />
+      <Head title="Manage Classes" />
 
       <div className="flex flex-col gap-6 animate-fade-in-up relative">
         <PageHeader
-          title="Rombels Management"
-          subtitle="Manage the list of classes (Rombongan Belajar)."
-          actionLabel="Add Rombel"
+          title="Classes Management"
+          subtitle="Manage the list of classes."
+          actionLabel="Add Class"
           onAction={handleOpenAddModal}
         />
 
         <SearchFilterBar
           searchValue={searchQuery}
           onSearchChange={onSearchChange}
-          placeholder="Search by rombel or teacher..."
+          placeholder="Search by class name or teacher..."
         >
             <div className="flex gap-2 sm:w-80">
                <Select
@@ -218,40 +218,40 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
         <Table>
           <Thead>
               <Th>#</Th>
-              <Th>Rombel Name</Th>
+              <Th>Class Name</Th>
               <Th>Grade Level</Th>
               <Th>Program</Th>
               <Th>Homeroom Teacher</Th>
               <Th>Actions</Th>
           </Thead>
           <Tbody>
-            {rombels.data.length > 0 ? (
-              rombels.data.map((rombel, index) => (
-                <tr key={rombel.rombel_id} className="hover:bg-gray-50 dark:hover:bg-background-dark/50 transition-colors">
+            {classes.data.length > 0 ? (
+              classes.data.map((cls, index) => (
+                <tr key={cls.student_class_id} className="hover:bg-gray-50 dark:hover:bg-background-dark/50 transition-colors">
                   <Td className="text-gray-500 text-sm">
-                      {rombels.from + index}
+                      {classes.from + index}
                   </Td>
-                  <Td className="font-semibold text-primary">{rombel.rombel_name}</Td>
-                  <Td>Kelas {rombel.grade_level}</Td>
+                  <Td className="font-semibold text-primary">{cls.class_name}</Td>
+                  <Td>Kelas {cls.grade_level}</Td>
                   <Td>
-                      <Badge variant={rombel.program ? 'primary' : 'gray'}>
-                          {rombel.program?.program_name || 'Umum'}
+                      <Badge variant={cls.program ? 'primary' : 'gray'}>
+                          {cls.program?.program_name || 'Umum'}
                       </Badge>
                   </Td>
                   <Td className="text-gray-900 dark:text-white">
-                      {rombel.homeroomTeacher?.full_name || '-'}
+                      {cls.homeroomTeacher?.full_name || '-'}
                   </Td>
                   <Td>
                     <div className="flex items-center gap-4">
                       <button
-                        onClick={() => handleOpenEditModal(rombel)}
+                        onClick={() => handleOpenEditModal(cls)}
                         className="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1.5 transition-colors"
                       >
                         <Icon name="edit" className="text-lg" />
                         Edit
                       </button>
                       <button
-                        onClick={() => handleOpenDeleteModal(rombel)}
+                        onClick={() => handleOpenDeleteModal(cls)}
                         className="text-red-500 hover:text-red-400 text-sm font-medium flex items-center gap-1.5 transition-colors"
                       >
                         <Icon name="delete" className="text-lg" />
@@ -262,14 +262,14 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
                 </tr>
               ))
             ) : (
-              <EmptyState message="No rombels found matching your criteria." colSpan={6} />
+              <EmptyState message="No classes found matching your criteria." colSpan={6} />
             )}
           </Tbody>
         </Table>
 
-        {rombels.links.length > 3 && (
+        {classes.links.length > 3 && (
             <div className="flex items-center justify-center p-4 gap-1 flex-wrap">
-                {rombels.links.map((link, key) => (
+                {classes.links.map((link, key) => (
                     link.url === null ? (
                         <div key={key} className="px-3 py-1 text-sm text-gray-400 border rounded-lg" dangerouslySetInnerHTML={{ __html: link.label }} />
                     ) : (
@@ -289,29 +289,29 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={modalMode === 'add' ? 'Add New Rombel' : 'Edit Rombel'}
+          title={modalMode === 'add' ? 'Add New Class' : 'Edit Class'}
           footer={
               <>
                   <Button variant="secondary" onClick={() => setIsModalOpen(false)} disabled={processing}>Cancel</Button>
                   <Button onClick={handleSubmit} isLoading={processing}>
-                      {modalMode === 'add' ? 'Save Rombel' : 'Update Rombel'}
+                      {modalMode === 'add' ? 'Save Class' : 'Update Class'}
                   </Button>
               </>
           }
         >
           <div className="space-y-4">
               <div className="space-y-2">
-                  <Label htmlFor="rombel_name">Rombel Name</Label>
+                  <Label htmlFor="class_name">Class Name</Label>
                   <Input
                     type="text"
-                    id="rombel_name"
-                    value={data.rombel_name}
-                    onChange={(e) => setData('rombel_name', e.target.value)}
+                    id="class_name"
+                    value={data.class_name}
+                    onChange={(e) => setData('class_name', e.target.value)}
                     placeholder="e.g. X MIPA 1"
                     autoFocus
                     required
                   />
-                  {errors.rombel_name && <p className="text-sm text-red-500">{errors.rombel_name}</p>}
+                  {errors.class_name && <p className="text-sm text-red-500">{errors.class_name}</p>}
               </div>
 
               <div className="space-y-2">
@@ -369,8 +369,8 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleDeleteConfirm}
-          title="Delete Rombel?"
-          message={<>Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{selectedRombel?.rombel_name}</span>?</>}
+          title="Delete Class?"
+          message={<>Are you sure you want to delete <span className="font-semibold text-gray-900 dark:text-white">{selectedClass?.class_name}</span>?</>}
           confirmLabel={processing ? "Deleting..." : "Delete"}
           variant="danger"
         />
@@ -387,4 +387,4 @@ const RombelIndex: React.FC<IndexProps> = ({ auth, rombels, programs, teachers, 
   );
 };
 
-export default RombelIndex;
+export default ClassIndex;

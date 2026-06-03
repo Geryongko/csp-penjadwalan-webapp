@@ -19,7 +19,7 @@ class ProfileController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $user->load(['studentProfile.major.faculty', 'studentProfile.semester', 'profileInfo']);
+        $user->load(['studentProfile.program', 'studentProfile.semester', 'profileInfo']);
 
         $grades = Grade::with('course')
             ->where('student_id', $user->user_id)
@@ -28,9 +28,9 @@ class ProfileController extends Controller
             ->map(function ($grade) {
                 return [
                     'semester' => $grade->semester_id,
-                    'code' => $grade->course->course_code,
-                    'name' => $grade->course->course_name,
-                    'sks' => $grade->course->sks,
+                    'code' => $grade->course->course_code ?? '-',
+                    'name' => $grade->course->course_name ?? '-',
+                    'sks' => $grade->course->sks ?? 0,
                     'grade' => $grade->grade_char,
                 ];
             });
@@ -40,8 +40,8 @@ class ProfileController extends Controller
                 'fullName' => $user->full_name,
                 'email' => $user->email,
                 'nim' => $user->studentProfile?->student_number ?? '-',
-                'faculty' => $user->studentProfile?->faculty?->faculty_name ?? '-',
-                'major' => $user->studentProfile?->major?->major_name ?? '-',
+                'faculty' => 'SMA Peminatan',
+                'major' => $user->studentProfile?->program?->program_name ?? '-',
                 'semester' => $user->studentProfile?->current_semester_level ?? 1,
                 'batchYear' => $user->studentProfile?->batch_year ?? '-',
                 'gpa' => $user->studentProfile?->gpa ?? 0.00,
