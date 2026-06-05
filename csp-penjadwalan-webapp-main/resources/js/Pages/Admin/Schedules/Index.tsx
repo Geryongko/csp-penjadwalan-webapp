@@ -53,7 +53,9 @@ const ScheduleIndex: React.FC<IndexProps> = ({ auth, schedules }) => {
                 />
 
                 <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-4">{t('Generated Master Timetable')}</h3>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                        <h3 className="text-lg font-bold">{t('Generated Master Timetable')}</h3>
+                    </div>
                     
                     {Object.keys(schedules).length === 0 ? (
                         <div className="text-center py-12 text-gray-500">

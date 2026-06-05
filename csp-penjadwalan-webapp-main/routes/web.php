@@ -56,10 +56,11 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         
-        Route::post('/schedules/generate', [\App\Http\Controllers\Admin\ScheduleController::class, 'generate'])->name('schedules.generate');
+        Route::post('schedules/generate', [App\Http\Controllers\Admin\ScheduleController::class, 'generate'])->name('schedules.generate');
         Route::get('/schedules', [\App\Http\Controllers\Admin\ScheduleController::class, 'index'])->name('schedules.index');
 
-        Route::resource('users', App\Http\Controllers\Admin\UserController::class);
+        Route::post('users/bulk', [App\Http\Controllers\Admin\UserController::class, 'bulkStore'])->name('users.bulk');
+        Route::resource('users', App\Http\Controllers\Admin\UserController::class)->except(['create', 'show', 'edit']);
         Route::resource('programs', App\Http\Controllers\Admin\ProgramController::class)->except(['show']);
         Route::resource('rooms', App\Http\Controllers\Admin\RoomController::class)->except(['show']);
         Route::resource('semesters', App\Http\Controllers\Admin\SemesterController::class)->except(['show']);
@@ -81,10 +82,21 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware(['auth', 'verified', 'teacher'])->prefix('teacher')->name('teacher.')->group(function () {
         Route::get('dashboard', [App\Http\Controllers\Teacher\DashboardController::class, 'index'])->name('dashboard');
+        
+        // Attendance Routes
+        Route::get('attendance', [App\Http\Controllers\Teacher\AttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('attendance/{assignmentId}', [App\Http\Controllers\Teacher\AttendanceController::class, 'show'])->name('attendance.show');
+        Route::post('attendance/{assignmentId}/sessions/init', [App\Http\Controllers\Teacher\AttendanceController::class, 'initSession'])->name('attendance.initSession');
+        Route::post('attendance/{assignmentId}/sessions', [App\Http\Controllers\Teacher\AttendanceController::class, 'storeSession'])->name('attendance.storeSession');
+        Route::get('attendance/{assignmentId}/sessions/{sessionId}/edit', [App\Http\Controllers\Teacher\AttendanceController::class, 'editSession'])->name('attendance.editSession');
+        Route::put('attendance/{assignmentId}/sessions/{sessionId}', [App\Http\Controllers\Teacher\AttendanceController::class, 'updateAttendance'])->name('attendance.updateAttendance');
     });
 
     Route::middleware(['auth', 'verified', 'student'])->prefix('student')->name('student.')->group(function () {
         Route::get('dashboard', [App\Http\Controllers\Student\DashboardController::class, 'index'])->name('dashboard');
+        
+        Route::get('attendance', [App\Http\Controllers\Student\AttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('attendance/{assignmentId}', [App\Http\Controllers\Student\AttendanceController::class, 'show'])->name('attendance.show');
         
         // KRS logic has been removed for SMA
         

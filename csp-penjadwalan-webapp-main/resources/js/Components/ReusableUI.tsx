@@ -53,19 +53,23 @@ interface PageHeaderProps {
     actionLabel?: string;
     onAction?: () => void;
     actionIcon?: string;
+    additionalActions?: React.ReactNode;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, actionLabel, onAction, actionIcon = "add" }) => (
+export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, actionLabel, onAction, actionIcon = "add", additionalActions }) => (
   <div className="flex flex-wrap justify-between items-center gap-4">
     <div className="flex flex-col gap-1">
       <h1 className="text-gray-900 dark:text-white text-3xl font-bold leading-tight tracking-tight">{title}</h1>
       <p className="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">{subtitle}</p>
     </div>
-    {actionLabel && onAction && (
-      <Button onClick={onAction} icon={actionIcon}>
-        {actionLabel}
-      </Button>
-    )}
+    <div className="flex items-center gap-3">
+        {additionalActions}
+        {actionLabel && onAction && (
+        <Button onClick={onAction} icon={actionIcon}>
+            {actionLabel}
+        </Button>
+        )}
+    </div>
   </div>
 );
 

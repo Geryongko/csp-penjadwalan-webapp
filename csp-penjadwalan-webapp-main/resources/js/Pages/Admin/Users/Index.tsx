@@ -15,6 +15,7 @@ import {
   FeedbackModal,
   Input, Label, Select
 } from '../../../Components/ReusableUI';
+import BulkImportModal from '../../../Components/BulkImportModal';
 import useTranslation from '../../../Hooks/useTranslation';
 
 interface IndexProps {
@@ -27,6 +28,7 @@ interface IndexProps {
   };
   programs: Program[];
   semesters: Semester[];
+  studentClasses: any[];
   filters: {
     search?: string;
     role?: string;
@@ -37,11 +39,12 @@ interface IndexProps {
   };
 }
 
-const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, filters, flash = {} }) => {
+const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, studentClasses, filters, flash = {} }) => {
   const { t } = useTranslation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   const [addStep, setAddStep] = useState<'role_selection' | 'form'>('role_selection');
@@ -72,7 +75,7 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, fil
     birth_date: '',
     profile_picture: null as File | null,
 
-    program_id: '',
+    student_class_id: '',
     semester_id: '',
     batch_year: new Date().getFullYear().toString(),
 
@@ -110,7 +113,7 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, fil
         birth_date: user.birth_date ? user.birth_date.split('T')[0] : '',
         profile_picture: null as File | null,
 
-        program_id: '',
+        student_class_id: '',
         semester_id: '',
         batch_year: '',
         title: '',
@@ -118,7 +121,9 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, fil
     };
 
     if (user.role_id === 3 && user.student_profile) {
-        formData.program_id = String(user.student_profile.program_id);
+        if (user.enrollments && user.enrollments.length > 0) {
+            formData.student_class_id = String(user.enrollments[0].student_class_id);
+        }
         formData.semester_id = String(user.student_profile.semester_id);
         formData.batch_year = String(user.student_profile.batch_year);
     } else if (user.role_id === 2 && user.lecturer_profile) {
@@ -313,12 +318,12 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, fil
             {data.role_id === 3 && (
                 <>
                     <div className="space-y-2">
-                        <Label>{t('Peminatan')}</Label>
-                        <Select value={data.program_id} onChange={e => setData('program_id', e.target.value)} required>
-                            <option value="" disabled>{t('Select Peminatan')}</option>
-                            {programs.map(p => <option key={p.program_id} value={p.program_id}>{p.program_name}</option>)}
+                        <Label>{t('Class (Rombel)')}</Label>
+                        <Select value={data.student_class_id} onChange={e => setData('student_class_id', e.target.value)} required>
+                            <option value="" disabled>{t('Select Class')}</option>
+                            {studentClasses.map(c => <option key={c.student_class_id} value={c.student_class_id}>{c.class_name}</option>)}
                         </Select>
-                        {errors.program_id && <p className="text-sm text-red-500">{errors.program_id}</p>}
+                        {errors.student_class_id && <p className="text-sm text-red-500">{errors.student_class_id}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -330,7 +335,7 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, fil
                             {errors.semester_id && <p className="text-sm text-red-500">{errors.semester_id}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label>{t('Batch Year')}</Label>
+                            <Label>{t('Tahun Masuk')}</Label>
                             <Input type="number" value={data.batch_year} onChange={e => setData('batch_year', e.target.value)} required />
                             {errors.batch_year && <p className="text-sm text-red-500">{errors.batch_year}</p>}
                         </div>
@@ -365,7 +370,18 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, fil
       <Head title={t('User Management')} />
 
       <div className="flex flex-col gap-6 animate-fade-in-up relative">
-        <PageHeader title={t('User Management')} subtitle={t('Manage students, lecturers, and admin accounts.')} actionLabel={t('Add User')} actionIcon="person_add" onAction={handleOpenAddModal} />
+        <PageHeader 
+            title={t('User Management')} 
+            subtitle={t('Manage students, lecturers, and admin accounts.')} 
+            actionLabel={t('Add User')} 
+            actionIcon="person_add" 
+            onAction={handleOpenAddModal} 
+            additionalActions={
+                <Button variant="secondary" onClick={() => setIsImportModalOpen(true)}>
+                    <Icon name="upload_file" /> {t('Import Students')}
+                </Button>
+            }
+        />
 
         <SearchFilterBar searchValue={searchQuery} onSearchChange={onSearchChange} placeholder={t('Search by name or email...')}>
             <div className="sm:w-56">
@@ -408,7 +424,7 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, fil
                        user.role_id === 2 ? user.lecturer_profile?.lecturer_number : '-'}
                   </Td>
                   <Td className="text-gray-600 dark:text-gray-300 text-sm">
-                      {user.role_id === 3 ? user.student_profile?.program?.program_name :
+                      {user.role_id === 3 ? (user.enrollments && user.enrollments.length > 0 ? user.enrollments[0].student_class?.class_name : 'No Class') :
                        user.role_id === 2 ? (user.lecturer_profile?.position || 'Guru') : 'System Admin'}
                   </Td>
                   <Td>
@@ -437,6 +453,7 @@ const UserIndex: React.FC<IndexProps> = ({ auth, users, programs, semesters, fil
 
         <ConfirmationModal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} onConfirm={handleDeleteConfirm} title={t('Delete User?')} message={<>{t('Are you sure you want to delete')} <span className="font-semibold text-gray-900 dark:text-white">{selectedUser?.full_name}</span>?</>} confirmLabel={processing ? "Deleting..." : t('Delete')} variant="danger" />
         <FeedbackModal isOpen={feedback.isOpen} onClose={() => setFeedback(prev => ({ ...prev, isOpen: false }))} status={feedback.status} title={feedback.title} message={feedback.message} />
+        <BulkImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} studentClasses={studentClasses} semesters={semesters} />
       </div>
     </AdminLayout>
   );

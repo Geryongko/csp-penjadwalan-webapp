@@ -62,6 +62,12 @@ export default function StudentLayout({ children, user }: StudentLayoutProps) {
                     icon: 'history_edu',
                     id: route('student.catalog.index'),
                     active: component.startsWith('Student/Catalog')
+                },
+                {
+                    label: t('Kehadiran Saya'),
+                    icon: 'fact_check',
+                    id: route('student.attendance.index'),
+                    active: component.startsWith('Student/Attendance')
                 }
             ]
         },

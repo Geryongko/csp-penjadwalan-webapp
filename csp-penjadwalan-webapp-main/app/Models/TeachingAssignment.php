@@ -32,4 +32,9 @@ class TeachingAssignment extends Model
     {
         return $this->belongsTo(StudentClass::class, 'student_class_id', 'student_class_id');
     }
+
+    public function classSessions()
+    {
+        return $this->hasMany(ClassSession::class, 'assignment_id', 'assignment_id');
+    }
 }

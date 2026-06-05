@@ -52,6 +52,12 @@ export default function TeacherLayout({ children, user }: TeacherLayoutProps) {
             label: t('Dashboard'),
             icon: 'dashboard',
             active: component === 'Teacher/Dashboard'
+        },
+        {
+            id: route('teacher.attendance.index'),
+            label: t('Presensi Siswa'),
+            icon: 'checklist',
+            active: component.startsWith('Teacher/Attendance')
         }
     ], [component, t]);
 

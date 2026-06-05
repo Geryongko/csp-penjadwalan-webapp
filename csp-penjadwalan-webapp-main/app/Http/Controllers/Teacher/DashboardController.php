@@ -13,14 +13,26 @@ class DashboardController extends Controller
     {
         $teacher = Auth::user();
         
-        // Eager load lecturer profile
         $teacher->load(['lecturerProfile']);
 
-        // In a real SMA application, we would also load the Rombels where this teacher is homeroom
-        // and the Subjects they are scheduled to teach. We will add those later.
+        // 1. Get today's schedule
+        $todayDayOfWeek = date('N'); // 1 (Monday) to 7 (Sunday)
+        
+        $todaySchedule = \App\Models\Schedule::with(['studentClass', 'subject', 'room'])
+            ->where('teacher_id', $teacher->user_id)
+            ->where('day_of_week', $todayDayOfWeek)
+            ->orderBy('start_time')
+            ->get();
+
+        // 2. Get teaching assignments (classes they teach)
+        $assignments = \App\Models\TeachingAssignment::with(['subject', 'studentClass'])
+            ->where('teacher_id', $teacher->user_id)
+            ->get();
 
         return Inertia::render('Teacher/Dashboard', [
-            'teacher' => $teacher
+            'teacher' => $teacher,
+            'todaySchedule' => $todaySchedule,
+            'assignments' => $assignments
         ]);
     }
 }
