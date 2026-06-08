@@ -17,10 +17,6 @@ use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\CourseClassController;
 use App\Http\Controllers\Admin\CurriculumController;
-use App\Http\Controllers\Admin\CostComponentController;
-
-use App\Http\Controllers\Student\BillingController;
-use App\Http\Controllers\Student\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -72,12 +68,6 @@ Route::middleware('auth')->group(function () {
         Route::delete('curriculums/{id}', [App\Http\Controllers\Admin\CurriculumController::class, 'destroy'])->name('curriculums.destroy');
         
         Route::resource('teaching-assignments', App\Http\Controllers\Admin\TeachingAssignmentController::class)->only(['index', 'store', 'update', 'destroy']);
-        
-        Route::resource('cost_components', App\Http\Controllers\Admin\CostComponentController::class)->except(['show']);
-        
-        // Admin Billings
-        Route::get('billings', [App\Http\Controllers\Admin\BillingController::class, 'index'])->name('billings.index');
-        Route::post('billings', [App\Http\Controllers\Admin\BillingController::class, 'store'])->name('billings.store');
     });
 
     Route::middleware(['auth', 'verified', 'teacher'])->prefix('teacher')->name('teacher.')->group(function () {
@@ -99,10 +89,6 @@ Route::middleware('auth')->group(function () {
         Route::get('attendance/{assignmentId}', [App\Http\Controllers\Student\AttendanceController::class, 'show'])->name('attendance.show');
         
         // KRS logic has been removed for SMA
-        
-        Route::get('billing', [App\Http\Controllers\Student\BillingController::class, 'index'])->name('billing.index');
-        Route::post('billing/{billing}/pay', [App\Http\Controllers\Student\BillingController::class, 'pay'])->name('billing.pay');
-    
         Route::get('profile', [\App\Http\Controllers\Student\ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('profile', [\App\Http\Controllers\Student\ProfileController::class, 'update'])->name('profile.update');
         Route::put('password', [\App\Http\Controllers\Student\ProfileController::class, 'updatePassword'])->name('password.update');

@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Subject;
-use App\Models\Payment;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
@@ -27,22 +26,6 @@ class DashboardController extends Controller
         $activeSubjects = Subject::count();
 
 
-        $recentPayments = Payment::with('student')
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get()
-            ->map(function ($payment) {
-                return [
-                    'id' => $payment->payment_id,
-                    'order_id' => $payment->order_id,
-
-                    'student_name' => $payment->student ? $payment->student->full_name : 'Unknown Student',
-                    'amount' => $payment->total_amount,
-                    'status' => $payment->status,
-                    'date' => $payment->created_at->toIso8601String(),
-                ];
-            });
-
         return Inertia::render('Admin/Dashboard', [
             'auth' => [
                 'user' => Auth::user(),
@@ -59,8 +42,6 @@ class DashboardController extends Controller
                     'total' => $activeSubjects,
                 ],
             ],
-
-            'recentPayments' => $recentPayments,
         ]);
     }
 }

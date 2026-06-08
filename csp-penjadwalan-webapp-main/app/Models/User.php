@@ -84,14 +84,7 @@ class User extends Authenticatable
         return $this->hasOne(LecturerProfile::class, 'user_id', 'user_id');
     }
 
-    /**
-     * Relasi ke Grades (Riwayat Nilai).
-     * Digunakan untuk mengambil history nilai mahasiswa.
-     */
-    public function grades(): HasMany
-    {
-        return $this->hasMany(Grade::class, 'student_id', 'user_id');
-    }
+
 
 
     public function profileInfo()

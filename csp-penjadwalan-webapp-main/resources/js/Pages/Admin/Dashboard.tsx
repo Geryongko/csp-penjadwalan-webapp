@@ -6,14 +6,7 @@ import { PageHeader, Card, Badge } from '../../Components/ReusableUI';
 import Icon from '../../Components/Icon';
 import useTranslation from '@/Hooks/useTranslation';
 
-interface PaymentItem {
-    id: number;
-    order_id: string;
-    student_name: string;
-    amount: number;
-    status: string;
-    date: string;
-}
+
 
 interface DashboardProps {
     auth: any;
@@ -22,10 +15,10 @@ interface DashboardProps {
         lecturers: { total: number; };
         subjects: { total: number; };
     };
-    recentPayments: PaymentItem[];
+
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ auth, stats, recentPayments }) => {
+const Dashboard: React.FC<DashboardProps> = ({ auth, stats }) => {
   const { t } = useTranslation();
 
   const formatRupiah = (val: number) =>
@@ -85,59 +78,7 @@ const Dashboard: React.FC<DashboardProps> = ({ auth, stats, recentPayments }) =>
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-            <Card className="p-0 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                        {t('Recent Payments')}
-                    </h3>
-                </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead className="bg-gray-50 dark:bg-gray-800/50">
-                            <tr>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">{t('Order ID')}</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">{t('Student')}</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">{t('Date')}</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">{t('Status')}</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-right">{t('Amount')}</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-[#19222c]">
-                            {recentPayments && recentPayments.length > 0 ? (
-                                recentPayments.map((payment) => (
-                                    <tr key={payment.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
-                                        <td className="px-6 py-4 text-sm font-mono text-gray-500">{payment.order_id}</td>
-                                        <td className="px-6 py-4">
-                                            <p className="text-sm font-bold text-gray-900 dark:text-white">{payment.student_name}</p>
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                            {formatDate(payment.date)}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <Badge variant={getStatusVariant(payment.status)} className="uppercase text-[10px]">
-                                                {payment.status}
-                                            </Badge>
-                                        </td>
-                                        <td className="px-6 py-4 text-right font-bold text-gray-900 dark:text-white font-mono">
-                                            {formatRupiah(payment.amount)}
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={5} className="px-6 py-20 text-center flex flex-col items-center justify-center text-gray-400 italic w-full">
-                                        <Icon name="history" className="text-4xl mb-2 opacity-20" />
-                                        <span>{t('No recent payment activity found.')}</span>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
-        </div>
       </div>
     </AdminLayout>
   );

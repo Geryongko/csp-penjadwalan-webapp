@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
-use App\Models\Grade;
 use App\Models\User;
 
 class ProfileController extends Controller
@@ -21,19 +20,6 @@ class ProfileController extends Controller
 
         $user->load(['studentProfile.program', 'studentProfile.semester', 'profileInfo']);
 
-        $grades = Grade::with('course')
-            ->where('student_id', $user->user_id)
-            ->orderBy('semester_id', 'desc')
-            ->get()
-            ->map(function ($grade) {
-                return [
-                    'semester' => $grade->semester_id,
-                    'code' => $grade->course->course_code ?? '-',
-                    'name' => $grade->course->course_name ?? '-',
-                    'sks' => $grade->course->sks ?? 0,
-                    'grade' => $grade->grade_char,
-                ];
-            });
 
         return Inertia::render('Student/Profile/Edit', [
             'profile' => [
@@ -54,7 +40,6 @@ class ProfileController extends Controller
                 'goals' => $user->profileInfo->goals ?? '',
                 'quote' => $user->profileInfo->quote ?? '',
             ],
-            'grades' => $grades,
         ]);
     }
 

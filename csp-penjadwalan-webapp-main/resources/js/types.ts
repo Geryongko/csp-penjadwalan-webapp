@@ -92,36 +92,9 @@ export interface Curriculum {
   subject?: Subject;
 }
 
-export interface CostComponent {
-  cost_component_id: number;
-  component_name: string;
-  component_code: string;
-  billing_type: 'PER_SKS' | 'PER_COURSE' | 'PER_SEMESTER' | 'ONE_TIME';
-  amount: number;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface Billing {
-  billing_id: number;
-  description: string;
-  amount: number;
-  due_date: string;
-  status: 'unpaid' | 'paid' | 'overdue';
-  cost_component?: { component_name: string };
-  semester?: { semester_name: string };
-}
 
 export interface PageProps {
   auth: { user: User };
   flash: { success?: string; error?: string };
-  env: {
-      midtrans_client_key: string;
-  };
 }
 
-declare global {
-    interface Window {
-        snap: any;
-    }
-}

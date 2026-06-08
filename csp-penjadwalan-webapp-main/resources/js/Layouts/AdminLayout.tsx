@@ -117,24 +117,6 @@ export default function AdminLayout({ children, user }: AdminLayoutProps) {
                     active: component.startsWith('Admin/Schedules')
                 }
             ]
-        },
-        {
-            label: t('Finance'),
-            icon: 'payments',
-            children: [
-                {
-                    id: route('admin.cost_components.index'),
-                    label: t('Cost Components'),
-                    icon: 'monetization_on',
-                    active: component.startsWith('Admin/Finance/CostComponents')
-                },
-                {
-                    id: route('admin.billings.index'),
-                    label: t('Student Billings'),
-                    icon: 'receipt_long',
-                    active: component.startsWith('Admin/Billings')
-                }
-            ]
         }
     ], [component, current_locale]);
 

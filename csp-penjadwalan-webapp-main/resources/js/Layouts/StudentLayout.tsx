@@ -70,18 +70,6 @@ export default function StudentLayout({ children, user }: StudentLayoutProps) {
                     active: component.startsWith('Student/Attendance')
                 }
             ]
-        },
-        {
-            label: t('Finance'),
-            icon: 'payments',
-            children: [
-                {
-                    label: t('Tuition Bills'),
-                    icon: 'receipt_long',
-                    id: route('student.billing.index'),
-                    active: component.startsWith('Student/Billing')
-                }
-            ]
         }
     ], [component, t]);
 

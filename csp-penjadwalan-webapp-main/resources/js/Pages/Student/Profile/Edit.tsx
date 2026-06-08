@@ -24,18 +24,11 @@ interface Props {
         goals: string;
         quote: string;
     };
-    grades: Array<{
-        semester: number;
-        code: string;
-        name: string;
-        sks: number;
-        grade: string;
-    }>;
     flash: { success?: string; error?: string };
 }
 
-const StudentProfileView: React.FC<Props> = ({ auth, profile, grades, flash }) => {
-  const [activeTab, setActiveTab] = useState<'pribadi' | 'keamanan' | 'akademik' | 'tentang' | 'nilai'>('pribadi');
+const StudentProfileView: React.FC<Props> = ({ auth, profile, flash }) => {
+  const [activeTab, setActiveTab] = useState<'pribadi' | 'keamanan' | 'akademik' | 'tentang'>('pribadi');
   const [editStates, setEditStates] = useState({ pribadi: false, keamanan: false, tentang: false });
 
   const [feedback, setFeedback] = useState<{isOpen: boolean, status: 'success' | 'error', title: string, message: string}>({
@@ -190,7 +183,6 @@ const StudentProfileView: React.FC<Props> = ({ auth, profile, grades, flash }) =
                                         { id: 'keamanan', label: 'Account & Security', icon: 'shield_person' },
                                         { id: 'akademik', label: 'Academic Data', icon: 'school' },
                                         { id: 'tentang', label: 'About Me', icon: 'favorite' },
-                                        { id: 'nilai', label: 'Grade History', icon: 'history_edu' },
                                     ].map(tab => (
                                         <button
                                             key={tab.id}
@@ -506,41 +498,6 @@ const StudentProfileView: React.FC<Props> = ({ auth, profile, grades, flash }) =
                                 </div>
                             )}
 
-                            {activeTab === 'nilai' && (
-                                <div className="p-6 animate-fade-in">
-                                    <div className="flex flex-col gap-6">
-                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Academic Grade History</h3>
-                                        <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
-                                            <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
-                                                <thead className="bg-slate-50 dark:bg-slate-800">
-                                                    <tr>
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Semester</th>
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Course Code</th>
-                                                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Course Name</th>
-                                                        <th className="px-6 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Credits</th>
-                                                        <th className="px-6 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Grade</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="bg-white dark:bg-[#19222c] divide-y divide-slate-200 dark:divide-slate-800">
-                                                    {grades.length > 0 ? grades.map((grade, idx) => (
-                                                        <tr key={idx}>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">{grade.semester}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300 font-mono">{grade.code}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-800 dark:text-slate-200">{grade.name}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-slate-600 dark:text-slate-300">{grade.sks}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-center text-slate-800 dark:text-slate-200">{grade.grade}</td>
-                                                        </tr>
-                                                    )) : (
-                                                        <tr>
-                                                            <td colSpan={5} className="px-6 py-8 text-center text-gray-500 italic">No grade history available.</td>
-                                                        </tr>
-                                                    )}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
 
                         </div>
                     </div>
